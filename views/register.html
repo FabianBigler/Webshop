@@ -14,6 +14,7 @@
                 </label>
                 <div class="col-sm-8">
                     <input type="email" class="form-control" placeholder="{{'email' | translate}}"
+                           ng-required="true"
                            ng-model="newUser.email" />
                 </div>
             </div>
@@ -23,6 +24,7 @@
                 </label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" placeholder="{{'street' | translate}}"
+                           ng-required="true"
                            ng-model="newUser.street" />
                 </div>
             </div>
@@ -32,10 +34,12 @@
                 </label>
                 <div class="col-sm-2">
                     <input type="text" class="form-control" placeholder="{{'postCode' | translate}}"
+                           ng-required="true"
                            ng-model="newUser.postCode" />
                 </div>
                 <div class="col-sm-6">
                     <input type="text" class="form-control" placeholder="{{'city' | translate}}"
+                            ng-required="true"
                            ng-model="newUser.city" />
                 </div>
             </div>
@@ -44,18 +48,21 @@
                     {{'password' | translate}}
                 </label>
                 <div class="col-sm-8">
-                    <input type="password" class="form-control" placeholder="{{'password' | translate}}"
+                    <input type="password" class="form-control" placeholder="{{'password' | translate}}" 
+                           ng-required="true"
                            ng-model="newUser.password" />
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group has-feedback">
                 <label for="passwordConfirm" class="col-sm-4 control-label">
                     {{'passwordConfirm' | translate}}
                 </label>
                 <div class="col-sm-8">
-                    <input type="password" class="form-control" placeholder="{{'passwordConfirm' | translate}}"
+                    <input type="password" class="form-control" placeholder="{{'passwordConfirm' | translate}}" aria-describedby="successStatus"
+                           ng-required="true"
                            ng-model="newUser.passwordConfirm" />
-                    
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"
+                          ng-show="passwordsMatch()"></span>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary pull-right"
@@ -66,6 +73,3 @@
         </form>
     </div>
 </div>
-<script type="text/ng-template" id="success.html">
-
-</script

@@ -5,10 +5,16 @@
     function RegisterViewModel($scope, $http, rootUrl) {
         $scope.newUser = {};
         $scope.statusAlerts = [];
+                
+        $scope.passwordsMatch = function() {
+            return $scope.newUser.password
+                && $scope.newUser.password === $scope.newUser.passwordConfirm;
+        }
         
         $scope.canSubmit = function() {
             return $scope.registerForm.$dirty 
-                && $scope.registerForm.$valid;
+                && $scope.registerForm.$valid
+                && $scope.passwordsMatch();
         };
         
         $scope.submit = function() {
@@ -17,7 +23,7 @@
                 $scope.newUser = {};
             });
         };
-        
+                
         $scope.removeAlert = function(statusAlert) {
             $scope.statusAlerts.splice($scope.statusAlerts.indexOf(statusAlert), 1);
         };
