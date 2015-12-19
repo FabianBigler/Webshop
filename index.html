@@ -7,47 +7,57 @@
     <meta charset="utf-8" />
 
     <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic" />
+    <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" />
     <link type="text/css" rel="stylesheet" href="styles/app.css" />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/i18n/angular-locale_de-ch.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.2/ui-bootstrap-tpls.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.8.1/angular-translate.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/de.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.6/rx.all.js"></script>
-	
-	<script type="text/javascript">
-		if (window.console === undefined) {
-			window.console = { log: function () { }, info: function () { }, warn: function () { }, error: function () { } };
-		}
-    </script>
+    <script type="text/javascript" src="scripts/app.js"></script>
+    <script type="text/javascript" src="scripts/translations.js"></script>
     <script type="text/javascript" src="views/product-overview.js"></script>
     <script type="text/javascript" src="views/product-detail.js"></script>
-	<script type="text/javascript" src="scripts/app.js"></script>
+    <script type="text/javascript" src="views/register.js"></script>
+    <script type="text/javascript" src="scripts/routing.js"></script>
 </head>
-<body ng-controller="HomeViewModel as home">
+
+<body ng-controller="AppViewModel as app">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand page-scroll" ng-href="{{rootUrl}}"><img id="logo" src="assets/img/logo.png"></a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li ui-sref-active="active">
+                        <a href ui-sref="overview">{{ 'overview' | translate }}</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a href ui-sref="product-detail({id:19})">{{ 'title' | translate }}</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a href ui-sref="user-register">{{ 'register' | translate }}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+        
     <header>
-        <div id="banner" role="banner" class="relative">
-            <img id="logo" src="/assets/logo.png" />
-        </div>
-        <div id="main-app-bar" ng-cloak>
-            <div class="container">
-                <div class="pull-left">
-                    <h1 id="page-header">Da FUCK</h1>
-                </div>
-             </div> 
-        </div>
     </header>
-
-    <main class="container" ng-cloak>
-		<p>{{home.state2}}</p>
-        <input type="button" ng-click="home.sayHelloWorld('bisch du dumm??')" />
-		
-		<ui-view />
+    
+    <main ng-cloak>
+        <div class="container">
+            <ui-view />
+        </div>
     </main>
-
+    
     <footer>
     </footer>
 </body>

@@ -1,19 +1,33 @@
 'use strict';
 
 (function (product) {
-	
-	function OverviewViewModel() {
-	}
-	
+    
+    function OverviewViewModel($scope, $http, rootUrl) {
+        $scope.products = [];
+        
+        loadAllProducts().then(function (products) {
+            $scope.products = products;
+        });
+        
+        function loadAllProducts() {
+            return $http({
+                url: rootUrl + '/controller.php?controller=product&action=getAll',
+                method: 'GET',
+                params: null,
+            })
+            .then(maribelle.mapData);
+        }
+    }
+
     product.overviewRoute = {
-		name: 'products-overview',
-		url: '/products/overview',
-		views: {
-			'@': {
-				templateUrl: 'views/product-overview.html',
-				controller: OverviewViewModel
-			}
-		}
-	}
-	
+        name: 'overview',
+        url: '/home',
+        views: {
+            '@': {
+                templateUrl: 'views/product-overview.html',
+                controller: OverviewViewModel
+            }
+        }
+    }
+
 })(maribelle.product || (maribelle.product = {}));

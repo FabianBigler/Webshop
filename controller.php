@@ -8,6 +8,7 @@ class ControllerFactory {
 	
 	function __construct() {
 		$this->registerController(new ProductController(new ProductRepository()));
+		$this->registerController(new UserController(new UserRepository()));
 	}
 	
 	public function resolveController($controllerName) {
@@ -43,6 +44,10 @@ class ControllerBase {
 		header('Content-Type: application/json');
 		echo json_encode($result);
 	}
+    
+    protected function getJsonInput() {
+        return json_decode(file_get_contents('php://input'), true);
+    }
 }
 
 class ProductController extends ControllerBase {
@@ -72,42 +77,35 @@ class ProductController extends ControllerBase {
 
 class UserController extends ControllerBase {
 	private $userRepository;
-	
-		function __construct($userRepository) {
-			parent::__construct("user");
-			$this->userRepository = $userRepository;
-			$this->registerAction("register", function() { $this->register(); });
-			$this->registerAction("login", function() { $this->login(); });
-		}
-	
-		public function register()
-		{
-			$user = new User();
-			$user->email = $_POST["email"];			
-			$user->role = 2; //default role: customer^
-			$user->street = $_POST["street"];
-			$user->postCode = $_POST["postCode"];
-			$user->city = $_POST["city"];
-			$user->setPassword($_POST["password"]);			
-			$userRepository.insertUser($email, $role, $password, $salt, $street, $postCode, $city)
-		}
-		
-		public function login()
-		{
-			$email = $_POST["email"];
-			$pwd = $_POST["password"];			
-			$user = $userRepository.getUserByEmail($email);						
-			if(ISSET($user)) {				
-				if ($user->password === $user->getHash($pwd))
-				{
-					$this->renderJsonResult(true);
-				} else {
-					$this->renderJsonResult(false);
-				}				
-			} else {
-				$this->renderJsonResult(false);
-			}
-		}
+    
+    function __construct($userRepository) {
+        parent::__construct("user");
+        $this->userRepository = $userRepository;
+        $this->registerAction("register", function() { $this->register(); });
+        $this->registerAction("login", function() { $this->login(); });
+    }
+
+    public function register() {
+        $user = new User();
+        $user->applyValuesFromArray($this->getJsonInput());
+        $this->userRepository->addUser($user);
+    }
+    
+    public function login()	{
+        $email = $_POST["email"];
+        $pwd = $_POST["password"];			
+        $user = $userRepository.getUserByEmail($email);						
+        if(ISSET($user)) {				
+            if ($user->password === $user->getHash($pwd))
+            {
+                $this->renderJsonResult(true);
+            } else {
+                $this->renderJsonResult(false);
+            }				
+        } else {
+            $this->renderJsonResult(false);
+        }
+    }
 }
 
 $controllerFactory = new ControllerFactory();

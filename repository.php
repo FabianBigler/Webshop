@@ -69,11 +69,10 @@ class UserRepository extends RepositoryBase
 	}
 	
 
-	public function insertUser($user)
-	{
+	public function addUser($user) {
 		$this->initConnection();
-		$sql = "INSERT INTO `user`(`email`, `role`, `password`, `salt`, `street`, `postCode`, `city`) VALUES (?,?,?,?,?,?,?)'"
-		$stmt = $this->conn->prepare($sql);		
+		$sql = "INSERT INTO `user` (`email`, `role`, `password`, `salt`, `street`, `postCode`, `city`) VALUES (?,?,?,?,?,?,?)";
+		$stmt = $this->conn->prepare($sql) or die($this->conn->error);      		
 		$stmt->bind_param('sisssss', $user->email, $user->role, $user->password, $user->salt, $user->street, $user->postCode, $user->city);
 		$stmt->execute();				
 	}
@@ -102,7 +101,7 @@ class ProductRepository extends RepositoryBase
 	private function getProducts($language, $id = NULL)
 	{		
 		$this->initConnection();
-		$sql = "SELECT `product`.`id`, `price`, `imgSmallPath`, name, description, 
+		$sql = "SELECT product.id, name, price, imgSmallPath, description, 
 		`short-description` FROM `product` INNER JOIN `productText` 
         ON (product.id=`productText`.`product-id` 
 		AND `language-code`=?";

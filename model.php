@@ -31,8 +31,13 @@ class BasketItem extends EntityBase
 	public $amount;
 }
 
-class User extends EntityBase
-{
+class User extends EntityBase {
+    function __construct() {
+        // 1 = superuser
+        // 2 = customer
+        $this->role = 2;
+    }
+    
 	public $email;
 	public $street;
 	public $postCode;
@@ -47,8 +52,16 @@ class User extends EntityBase
 	}
 	
 	public function getHash($password) {
-		return hash(’W00TThIsIsRANDOM78’, $password + $this->salt);
+		return hash("sha256", $password + $this->salt);
 	}
+    
+    public function applyValuesFromArray($newValues) {
+        $this->email = $newValues["email"];			
+        $this->street = $newValues["street"];
+        $this->postCode = $newValues["postCode"];
+        $this->city = $newValues["city"];
+        $this->setPassword($newValues["password"]);	
+    }
 }
 
 class Ingredient extends EntityBase
