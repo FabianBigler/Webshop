@@ -64,10 +64,50 @@ class ProductController extends ControllerBase {
 	{
 		$productId = htmlspecialchars($_GET["productId"]);
 		$result = $this->productRepository->
-					GetProductWithIngredients(
-						WebshopContext::GetLanguage(), $productId);
+					getProductWithIngredients(
+						WebshopContext::getLanguage(), $productId);
 		$this->renderJsonResult($result);
 	}
+}
+
+class UserController extends ControllerBase {
+	private $userRepository;
+	
+		function __construct($userRepository) {
+			parent::__construct("user");
+			$this->userRepository = $userRepository;
+			$this->registerAction("register", function() { $this->register(); });
+			$this->registerAction("login", function() { $this->login(); });
+		}
+	
+		public function register()
+		{
+			$user = new User();
+			$user->email = $_POST["email"];			
+			$user->role = 2; //default role: customer^
+			$user->street = $_POST["street"];
+			$user->postCode = $_POST["postCode"];
+			$user->city = $_POST["city"];
+			$user->setPassword($_POST["password"]);			
+			$userRepository.insertUser($email, $role, $password, $salt, $street, $postCode, $city)
+		}
+		
+		public function login()
+		{
+			$email = $_POST["email"];
+			$pwd = $_POST["password"];			
+			$user = $userRepository.getUserByEmail($email);						
+			if(ISSET($user)) {				
+				if ($user->password === $user->getHash($pwd))
+				{
+					$this->renderJsonResult(true);
+				} else {
+					$this->renderJsonResult(false);
+				}				
+			} else {
+				$this->renderJsonResult(false);
+			}
+		}
 }
 
 $controllerFactory = new ControllerFactory();

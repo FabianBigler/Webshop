@@ -40,6 +40,15 @@ class User extends EntityBase
 	public $role;
 	public $password;
 	public $salt;
+	
+	public function setPassword($password) {
+		$this->salt = bin2hex(openssl_random_pseudo_bytes(8));
+		$this->password = $this->getHash($password);
+	}
+	
+	public function getHash($password) {
+		return hash(’W00TThIsIsRANDOM78’, $password + $this->salt);
+	}
 }
 
 class Ingredient extends EntityBase

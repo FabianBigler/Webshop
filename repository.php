@@ -17,9 +17,18 @@ class RepositoryBase
 
 class BasketRepository extends RepositoryBase
 {	
-	public function AddLine($userid, $productId)
+	public function AddLine($headerId, $productId, $amount)
 	{
+		$this->initConnection();
+		$sql = "INSERT INTO `basketLine`(`headerId`, `productId`, `productPrice`, `amount`) 
+				VALUES (?,?,SELECT price FROM product WHERE product.id = productId,?)";						
+		$stmt = $this->conn->prepare($sql);		
+		$stmt->bind_param('iid', $headerId, $productId, $amount);
 		
+		if($stmt === false) {
+		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
+		}		
+		$stmt->execute();
 	}
 	
 	public function GetOrCreate($userId)
@@ -28,14 +37,56 @@ class BasketRepository extends RepositoryBase
 	}
 }
 
+class UserRepository extends RepositoryBase
+{
+	public function getUserByEmail($email)
+	{
+		$this->initConnection();
+		$sql = "SELECT `id`, `email`, `role`, `password`, `salt`, `street`, `postCode`, `city` FROM `user` WHERE `email`=?";		
+		$stmt = $this->conn->prepare($sql);		
+		$stmt->bind_param('s', $email);		
+		if($stmt === false) {
+		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
+		}
+		
+		$stmt->execute();		
+		$stmt->bind_result($row_id, $row_email, $row_role, $row_pw, $row_salt, $row_street, $row_postCode, $row_city);
+		
+		if($stmt->fetch())
+		{
+			$user = new User();
+			$user->id = $row_id;
+			$user->email = $row_email;
+			$user->street = $row_street;
+			$user->postCode = $row_postCode;
+			$user->city = $row_city;
+			$user->role = $row_role;
+			$user->password = $row_pw;
+			$user->salt = $row_salt;	
+			return $user;
+		}
+		return null;		
+	}
+	
+
+	public function insertUser($user)
+	{
+		$this->initConnection();
+		$sql = "INSERT INTO `user`(`email`, `role`, `password`, `salt`, `street`, `postCode`, `city`) VALUES (?,?,?,?,?,?,?)'"
+		$stmt = $this->conn->prepare($sql);		
+		$stmt->bind_param('sisssss', $user->email, $user->role, $user->password, $user->salt, $user->street, $user->postCode, $user->city);
+		$stmt->execute();				
+	}
+}
+
 class ProductRepository extends RepositoryBase
 {		
-	public function GetAll($language)
+	public function getAll($language)
 	{
 		return $this->getProducts($language);
 	}
 	
-	public function GetProductWithIngredients($language, $id)
+	public function getProductWithIngredients($language, $id)
 	{		
 		$products = $this->getProducts($language, $id);
 		echo count($products);
