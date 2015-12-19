@@ -1,9 +1,12 @@
 <?php
+require_once("model.php");
+require_once("repository.php");
+
 class ControllerFactory {
 	private $controllers = array();
 	
 	function __construct() {
-		$this->registerController(new ProductController());
+		$this->registerController(new ProductController(new ProductRepository()));
 	}
 	
 	public function resolveController($controllerName) {
@@ -34,16 +37,25 @@ class ControllerBase {
 	protected function registerAction($actionName, $action) {
 		$this->actions[$actionName] = $action;
 	}
+	
+	protected function renderJsonResult($result) {
+		header('Content-Type: application/json');
+		echo json_encode($result);
+	}
 }
 
 class ProductController extends ControllerBase {
-	function __construct() {
+	private $productRepository;
+	
+	function __construct($productRepository) {
 		parent::__construct("product");
+		$this->productRepository = $productRepository;
 		$this->registerAction("getAll", function() { $this->getAll(); });
 	}
 	
 	public function getAll() {
-		echo 'ALL products';
+		$result = $this->productRepository->GetAll('DE');
+		$this->renderJsonResult($result);
 	}
 }
 

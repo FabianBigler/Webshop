@@ -46,12 +46,13 @@ class ProductRepository extends RepositoryBase
 		$sql = "SELECT `product`.`id`, `price`, `imgSmallPath`, name, description, 
 		`short-description` FROM `product` LEFT JOIN `productText` 
         ON (product.id=`productText`.`product-id` 
-		AND `language-code`=" . htmlspecialchars($language) . ")";
+		AND `language-code`='" . htmlspecialchars($language) . "')";
 		if(isset($id)) {
 			$sql = $sql . ' AND `product`.`id` =" '. $id .'"' ;
 		}
 		
 		$stmt = $this->conn->query($sql);		
+		if (!stmt)
 		$products = array();
 		while($row = $stmt->fetch_assoc())
 		{
