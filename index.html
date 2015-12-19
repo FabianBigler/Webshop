@@ -17,17 +17,20 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/de.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.6/rx.all.js"></script>
-    <script type="text/javascript" src="scripts/app.js"></script>
-    <script type="text/javascript">
-        if (window.console === undefined) {
-            window.console = { log: function () { }, info: function () { }, warn: function () { }, error: function () { } };
-        }
+	
+	<script type="text/javascript">
+		if (window.console === undefined) {
+			window.console = { log: function () { }, info: function () { }, warn: function () { }, error: function () { } };
+		}
     </script>
+    <script type="text/javascript" src="views/product-overview.js"></script>
+    <script type="text/javascript" src="views/product-detail.js"></script>
+	<script type="text/javascript" src="scripts/app.js"></script>
 </head>
-<body ng-controller="IndexViewModel as ivm">
+<body ng-controller="HomeViewModel as home">
     <header>
         <div id="banner" role="banner" class="relative">
-            <img id="logo" src="logo.png" />
+            <img id="logo" src="/assets/logo.png" />
         </div>
         <div id="main-app-bar" ng-cloak>
             <div class="container">
@@ -39,9 +42,10 @@
     </header>
 
     <main class="container" ng-cloak>
-        <ui-view/>
-		{{result.data}}
-		{{result2.data}}
+		<p>{{home.state2}}</p>
+        <input type="button" ng-click="home.sayHelloWorld('bisch du dumm??')" />
+		
+		<ui-view />
     </main>
 
     <footer>
