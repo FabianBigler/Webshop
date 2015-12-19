@@ -11,6 +11,7 @@ class Product extends EntityBase
     public $imgSmallPath;
 	public $description;
     public $shortDescription;
+	public $ingredients;
 }
 
 class Basket extends EntityBase

@@ -1,6 +1,7 @@
 <?php
 require_once("model.php");
 require_once("repository.php");
+require_once("helper.php");
 
 class ControllerFactory {
 	private $controllers = array();
@@ -51,10 +52,20 @@ class ProductController extends ControllerBase {
 		parent::__construct("product");
 		$this->productRepository = $productRepository;
 		$this->registerAction("getAll", function() { $this->getAll(); });
+		$this->registerAction("get", function() { $this->get(); });
 	}
 	
-	public function getAll() {
-		$result = $this->productRepository->GetAll('DE');
+	public function getAll() {		
+		$result = $this->productRepository->GetAll(WebshopContext::GetLanguage());
+		$this->renderJsonResult($result);
+	}
+	
+	public function get()
+	{
+		$productId = htmlspecialchars($_GET["productId"]);
+		$result = $this->productRepository->
+					GetProductWithIngredients(
+						WebshopContext::GetLanguage(), $productId);
 		$this->renderJsonResult($result);
 	}
 }
