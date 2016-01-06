@@ -26,7 +26,12 @@
 				'basket': 'Warenkorb',
 				'detail': 'Detail',
 				'ingredients': 'Zusammensetzung',	
-				'addedItemToBasket': 'Artikel erfolgreich zum Warenkorb hinzugefügt!'
+				'addedItemToBasket': 'Artikel erfolgreich zum Warenkorb hinzugefügt!',
+				'givenname': 'Vorname',
+				'surname': 'Nachname',
+				'total': 'Total',
+				'deliveryAddress' : 'Lieferadresse',
+				'invoiceAddress' : 'Rechnungsadresse'
             });
 
             $translateProvider.translations('fr', {
