@@ -105,7 +105,7 @@ class User extends EntityBase {
     }
     
     private function isPasswordValid($password) {
-        return $this->password === $user->getHash($password);
+        return $this->password === $this->getHash($password);
     }
 	
 	private function getHash($password) {
