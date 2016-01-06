@@ -88,7 +88,6 @@ class ProductRepository extends RepositoryBase
 	public function getProductWithIngredients($language, $id)
 	{		
 		$products = $this->getProducts($language, $id);
-		echo count($products);
 		if(count($products) == 1)
 		{
 			$product = $products[0];
