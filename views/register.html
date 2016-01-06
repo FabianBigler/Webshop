@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-xs-12 col-sm-8 col-lg-6">
         <form name="registerForm" class="form-horizontal">
-            <div class="form-group">
+            <div class="form-group has-feedback">
                 <label for="email" class="col-sm-4 control-label">
                     {{'email' | translate}}
                 </label>
@@ -15,6 +15,28 @@
                     <input type="email" class="form-control" placeholder="{{'email' | translate}}"
                            ng-required="true"
                            ng-model="newUser.email" />
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"
+                          ng-show="emailAlreadyExists"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="givenname" class="col-sm-4 control-label">
+                    {{'givenname' | translate}}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" placeholder="{{'givenname' | translate}}"
+                           ng-required="true"
+                           ng-model="newUser.givenname" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="surname" class="col-sm-4 control-label">
+                    {{'surname' | translate}}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" placeholder="{{'surname' | translate}}"
+                           ng-required="true"
+                           ng-model="newUser.surname" />
                 </div>
             </div>
             <div class="form-group">
@@ -38,7 +60,7 @@
                 </div>
                 <div class="col-sm-6">
                     <input type="text" class="form-control" placeholder="{{'city' | translate}}"
-                            ng-required="true"
+                           ng-required="true"
                            ng-model="newUser.city" />
                 </div>
             </div>

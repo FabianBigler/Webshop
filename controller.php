@@ -82,25 +82,36 @@ class UserController extends ControllerBase {
         parent::__construct("user");
         $this->userRepository = $userRepository;
         $this->registerAction("register", function() { $this->register(); });
+        $this->registerAction("existsUser", function() { $this->existsUser(); });
         $this->registerAction("login", function() { $this->login(); });
+        $this->registerAction("getCurrentUser", function() { $this->getCurrentUser(); });
     }
 
     public function register() {
         $user = new User();
         $user->applyValuesFromArray($this->getJsonInput());
+        if ($this->userRepository->existsUserByEmail($user->email)) {
+            throw new Exception('User already exists.');
+        }
+        
         $this->userRepository->addUser($user);
+    }
+    
+    public function existsUser() {
+        $userExists = $this->userRepository->existsUserByEmail($_GET["email"]);
+        
+        $this->renderJsonResult($userExists);
     }
     
     public function login()	{
         $request = $this->getJsonInput();
-        $user = $this->userRepository->getUserByEmail($request["email"]);	
-        					
-        if (isset($user) && $user->password === $user->getHash($request["password"])) {	
-            $this->renderJsonResult(true);
-        }
-        else {
-            $this->renderJsonResult(false);
-        }
+        $success = User::login($this->userRepository, $request["email"], $request["password"]);
+        
+        $this->renderJsonResult($success);
+    }
+    
+    public function getCurrentUser() {
+        $this->renderJsonResult(User::current());
     }
 }
 

@@ -2,10 +2,19 @@
 
 (function (user) {
 
-    function RegisterViewModel($scope, $http, rootUrl) {
+    function RegisterViewModel($scope, $http, rootUrl, debounce) {
         $scope.newUser = {};
         $scope.status = {};
-                
+        $scope.emailAlreadyExists = false;
+        
+        $scope.$watch(
+            function() { return $scope.newUser.email; },
+            debounce(function(email) {
+                existsUser(email)
+                    .then(function(exists) { $scope.emailAlreadyExists = exists; });
+            }, 1000)
+        );
+        
         $scope.passwordsMatch = function() {
             return $scope.newUser.password
                 && $scope.newUser.password === $scope.newUser.passwordConfirm;
@@ -28,8 +37,17 @@
             return $http({
                 url: rootUrl + '/controller.php?controller=user&action=register',
                 method: 'POST',
-                data: newUser,
+                data: newUser
             });
+        }
+        
+        function existsUser(email) {
+            return $http({
+                url: rootUrl + '/controller.php?controller=user&action=existsUser',
+                method: 'GET',
+                params: { email: email }
+            })
+            .then(maribelle.mapData);
         }
     }
 

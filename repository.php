@@ -97,12 +97,10 @@ class BasketRepository extends RepositoryBase
 	}
 }
 
-class UserRepository extends RepositoryBase
-{
-	public function getUserByEmail($email)
-	{
+class UserRepository extends RepositoryBase {
+	public function getUserByEmail($email) {
 		$this->initConnection();
-		$sql = "SELECT `id`, `email`, `role`, `password`, `salt`, `street`, `postCode`, `city` FROM `user` WHERE `email`=?";		
+		$sql = "SELECT `id`, `email`, `role`, `password`, `salt`, `givenname`, `surname`, `street`, `postCode`, `city` FROM `user` WHERE `email`=?";		
 		$stmt = $this->conn->prepare($sql);		
 		$stmt->bind_param('s', $email);		
 		if($stmt === false) {
@@ -110,13 +108,15 @@ class UserRepository extends RepositoryBase
 		}
 		
 		$stmt->execute();		
-		$stmt->bind_result($row_id, $row_email, $row_role, $row_pw, $row_salt, $row_street, $row_postCode, $row_city);
+		$stmt->bind_result($row_id, $row_email, $row_role, $row_pw, $row_salt, $row_givenname, $row_surname, $row_street, $row_postCode, $row_city);
 		
 		if($stmt->fetch())
 		{
 			$user = new User();
 			$user->id = $row_id;
 			$user->email = $row_email;
+			$user->givenname = $row_givenname;
+			$user->surname = $row_surname;
 			$user->street = $row_street;
 			$user->postCode = $row_postCode;
 			$user->city = $row_city;
@@ -128,12 +128,17 @@ class UserRepository extends RepositoryBase
 		return null;		
 	}
 	
-
+    public function existsUserByEmail($email) {
+        // TODO: Implement query correctly
+        $res = $this->getUserByEmail($email);
+        return $res !== null;
+    }
+    
 	public function addUser($user) {
 		$this->initConnection();
-		$sql = "INSERT INTO `user` (`email`, `role`, `password`, `salt`, `street`, `postCode`, `city`) VALUES (?,?,?,?,?,?,?)";
+		$sql = "INSERT INTO `user` (`email`, `role`, `password`, `salt`, `givenname`, `surname`,  `street`, `postCode`, `city`) VALUES (?,?,?,?,?,?,?,?,?)";
 		$stmt = $this->conn->prepare($sql) or die($this->conn->error);      		
-		$stmt->bind_param('sisssss', $user->email, $user->role, $user->password, $user->salt, $user->street, $user->postCode, $user->city);
+		$stmt->bind_param('sisssssss', $user->email, $user->role, $user->password, $user->salt, $user->givenname, $user->surname, $user->street, $user->postCode, $user->city);
 		$stmt->execute();				
 	}
 }

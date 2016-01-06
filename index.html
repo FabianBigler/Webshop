@@ -46,7 +46,8 @@
                     <li ui-sref-active="active">
                         <a href ui-sref="user-register">{{ 'register' | translate }}</a>
                     </li>
-                    <li ui-sref-active="active">
+                    <li ui-sref-active="active"
+                        ng-show="!app.userAuthenticated">
                         <a href ui-sref="user-login">{{ 'login' | translate }}</a>
                     </li>
                 </ul>

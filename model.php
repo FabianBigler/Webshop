@@ -39,6 +39,8 @@ class User extends EntityBase {
         $this->role = 2;
     }
     
+	public $givenname;
+	public $surname;
 	public $email;
 	public $street;
 	public $postCode;
@@ -47,22 +49,52 @@ class User extends EntityBase {
 	public $password;
 	public $salt;
 	
+    public static function current() {
+        if (isset($_SESSION["currentUser"])) {
+            return $_SESSION["currentUser"];
+        }
+        else {
+            return null;
+        }
+    }
+    
+    public static function login($userRepository, $email, $password) {
+        $user = $userRepository->getUserByEmail($email);	
+        
+        if (isset($user) && $user->isPasswordValid($password)) {	
+            unset($user->salt);
+            unset($user->password);
+            $_SESSION["currentUser"] = $user;
+            
+            return true;
+        }
+        else {
+            return true;
+        }
+    }
+    
 	public function setPassword($password) {
 		$this->salt = bin2hex(openssl_random_pseudo_bytes(8));
 		$this->password = $this->getHash($password);
 	}
-	
-	public function getHash($password) {
-		return hash("sha256", $password . $this->salt);
-	}
     
     public function applyValuesFromArray($newValues) {
+        $this->givenname = $newValues["givenname"];			
+        $this->surname = $newValues["surname"];			
         $this->email = $newValues["email"];			
         $this->street = $newValues["street"];
         $this->postCode = $newValues["postCode"];
         $this->city = $newValues["city"];
         $this->setPassword($newValues["password"]);	
     }
+    
+    private function isPasswordValid($password) {
+        return $this->password === $user->getHash($password);
+    }
+	
+	private function getHash($password) {
+		return hash("sha256", $password . $this->salt);
+	}
 }
 
 class Ingredient extends EntityBase {

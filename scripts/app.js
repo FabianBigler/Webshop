@@ -12,7 +12,7 @@ var maribelle;
                 self.userName = userService.currentUser().name;
                 self.userAuthenticated = userService.isAuthenticated();
             }
-        )
+        );
 
         self.changeLanguage = function (langKey) {
             $translate.use(langKey);
@@ -87,10 +87,25 @@ var maribelle;
         }
     }
     
+    function DebounceFactory($timeout) {
+        return function(callback, interval) {
+            var timeout = null;
+            return function() {
+                var args = arguments;
+                $timeout.cancel(timeout);
+                timeout = $timeout(
+                    function () { callback.apply(this, args); }, 
+                    interval
+                );
+            };
+        }; 
+    }
+    
     angular.module('maribelle', ['maribelle.routing', 'maribelle.translations', 'ui.bootstrap', 'ngAnimate'])
-        .constant("rootUrl", "/fab")
+        .constant("rootUrl", "/bm")
         .controller('AppViewModel', AppViewModel)
         .service('userService', UserServiceFactory)
+        .factory('debounce', DebounceFactory)
         .run(function($rootScope, $rootElement, rootUrl) {
             $rootScope.$ignore = function() { return false };
             $rootScope.$today = moment().startOf('day').toDate();
