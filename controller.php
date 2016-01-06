@@ -135,13 +135,13 @@ class BasketController extends ControllerBase {
         parent::__construct("basket");
         $this->basketRepository = $basketRepository;
 		$this->productRepository = $productRepository;	
-        $this->registerAction("addItemToBasket", function() { $this->addItemToBasket(); });
-        $this->registerAction("removeItemfromBasket", function() { $this->removeItemfromBasket(); });
+        $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
+        $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
 		$this->registerAction("completeOrder", function() { $this->completeOrder(); });
 		$this->registerAction("getBasket", function() { $this->getBasket(); });			
     }
 	
-	public function addItemToBasket() {
+	public function addLineToBasket() {
         $this->verifyAuthenticated();
         
 		$basket = $this->basket();
@@ -166,27 +166,45 @@ class BasketController extends ControllerBase {
 		}
 	}
 	
-	public function removeItemfromBasket() {
+	public function removeLinefromBasket() {
         $this->verifyAuthenticated();
-        
-		//$basket = getBasket();
-		//$request = $this->getJsonInput();			
-		//unset($x[0]);
+        $request = $this->getJsonInput();		
+		$basket = $this->basket();
+		
+		$index = 0;
+		$foundIndex = null;
+		foreach ($basket->lines as $line) {			
+			if($line->productId == $request["productId"])
+			{
+				$foundIndex = $index;								
+			}
+			$index++;
+		}
+		
+		if(isset($foundIndex)) {
+			unset($basket->lines[$foundIndex]);	
+			$basket->lines = array_values($basket->lines);
+		}				
 	}
 	
 	public function completeOrder() {
         $this->verifyAuthenticated();
         
 		$basket = $this->basket();
+		if(count($basket->lines) == 0)
+		{
+			throw new Exception("Basket is empty");
+		}
+			
 		//persist basket, unset session basket
-		$basketRepository.CompleteOrder($basket);
+		$basketRepository->completeOrder($basket);
 		$_SESSION["basket"] = null;
 	}
 	
 	public function basket() {
 		if (!isset($_SESSION["basket"])) {
 			$_SESSION["basket"] = new Basket(User::current());;			
-		}
+		}	
         
 		return $_SESSION["basket"];		
 	}

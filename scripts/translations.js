@@ -31,7 +31,8 @@
 				'surname': 'Nachname',
 				'total': 'Total',
 				'deliveryAddress' : 'Lieferadresse',
-				'invoiceAddress' : 'Rechnungsadresse'
+				'invoiceAddress' : 'Rechnungsadresse',
+				'completeOrder' : 'Bestellung abschliessen'
             });
 
             $translateProvider.translations('fr', {

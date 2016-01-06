@@ -18,25 +18,34 @@
 		<thead>
 		  <tr>
 			<th>{{'name' | translate}}</th>
-			<th>{{'amount' | translate}}</th>
-			<th>{{'price' | translate}}</th>	
-			<th>{{'total' | translate}}</th>			
+			<th style="text-align:right">{{'amount' | translate}}</th>
+			<th style="text-align:right">{{'price' | translate}}</th>	
+			<th style="text-align:right">{{'total' | translate}}</th>
+			<th width="50px"></th>
 		  </tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="line in basket.lines">
 				<td>{{line.productName}}</td>
-				<td>{{line.amount}}</td>
-				<td>{{line.productPrice}}</td>
-				<td>{{line.amount * line.productPrice | number:2}}</td>
+				<td style="text-align:right">{{line.amount}}</td>
+				<td style="text-align:right">{{line.productPrice}}</td>
+				<td style="text-align:right">{{line.amount * line.productPrice | number:2}}</td>				
+				<td><button class="btn btn-primary glyphicon glyphicon-remove"						
+						ng-click="removeBasketLine(line)">						  
+				</button></td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr>
 				<td colspan="3"></td>
-				<td><strong>{{getTotal() | number:2}}</strong></td>
+				<td style="text-align:right"><strong >{{getTotal() | number:2}}</strong></td>
+				<td></td>
 			</tr>
 		</tfoot>
-		
 	</table>
+	<button type="submit" class="btn btn-primary pull-right"
+                    ng-disabled="!canCompleteOrder()"
+                    ng-click="completeOrder()">
+                    {{'completeOrder' | translate}}
+    </button>
 </div>

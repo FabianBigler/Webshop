@@ -51,8 +51,7 @@ class BasketRepository extends RepositoryBase
 			trigger_error('No Basketlines in Basket!');
 		}
 		
-		$this->initConnection();
-		
+		$this->initConnection();		
 		
 	}
 	

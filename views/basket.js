@@ -18,9 +18,34 @@
             .then(maribelle.mapData);
         }
 		
-		function removeItemfromBasket()
-		{
+		$scope.removeBasketLine = function(line) {				
+			var index = $scope.basket.lines.indexOf(line);						
+			$scope.basket.lines.splice(index, 1);					
+			removeLineFromBasket(line.productId);
+        };		
+
+		$scope.canCompleteOrder = function() {
+            return ($scope.basket.lines.length > 0);
+        };		
 		
+		$scope.completeOrder = function() {
+			completeOrder();
+		}
+
+		function removeLineFromBasket(id) {
+            return $http({
+                url: rootUrl + '/controller.php?controller=basket&action=removeLinefromBasket',
+                method: 'POST',
+                data: { productId: id }
+            });
+        }		
+		
+		function completeOrder()
+		{
+			return $http({
+                url: rootUrl + '/controller.php?controller=basket&action=completeOrder',
+                method: 'POST',                
+            });
 		}
 		
 		$scope.getTotal = function() {
