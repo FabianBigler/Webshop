@@ -11,7 +11,8 @@
                 .state(maribelle.product.overviewRoute)
                 .state(maribelle.product.detailRoute)
                 .state(maribelle.user.registerRoute)
-                .state(maribelle.user.loginRoute);
+                .state(maribelle.user.loginRoute)
+				.state(maribelle.basket.basketRoute);
         });
 
 })(maribelle.routing || (maribelle.routing = {}));

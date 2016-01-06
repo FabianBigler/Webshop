@@ -1,8 +1,9 @@
 <?php
-
 require_once("model.php");
 require_once("repository.php");
 require_once("helper.php");
+
+session_start();
 
 class ControllerFactory {
 	private $controllers = array();
@@ -10,6 +11,7 @@ class ControllerFactory {
 	function __construct() {
 		$this->registerController(new ProductController(new ProductRepository()));
 		$this->registerController(new UserController(new UserRepository()));
+		$this->registerController(new BasketController(new BasketRepository(), new ProductRepository()));
 	}
 	
 	public function resolveController($controllerName) {
@@ -100,6 +102,82 @@ class UserController extends ControllerBase {
             $this->renderJsonResult(false);
         }
     }
+}
+
+class BasketController extends ControllerBase {	
+	private $basketRepository;
+	private $productRepository;
+    
+    function __construct($basketRepository, $productRepository) {
+        parent::__construct("basket");
+        $this->basketRepository = $basketRepository;
+		$this->productRepository = $productRepository;	
+        $this->registerAction("addItemToBasket", function() { $this->addItemToBasket(); });
+        $this->registerAction("removeItemfromBasket", function() { $this->removeItemfromBasket(); });
+		$this->registerAction("completeOrder", function() { $this->completeOrder(); });
+		$this->registerAction("getBasket", function() { $this->getBasket(); });			
+    }
+	
+	public function addItemToBasket()
+	{
+		$basket = $this->basket();
+		$request = $this->getJsonInput();		
+		$found = false;
+		foreach ($basket->lines as $line) {
+			if($line->productId == $request["productId"])
+			{
+				$found = true;
+				$line->amount += $request["amount"];
+			}
+		}
+		
+		if(!$found) {
+			$product = $this->productRepository->getProduct(WebshopContext::GetLanguage(), $request["productId"]);
+			$basketLine = new BasketLine();
+			$basketLine->productId = $request["productId"];
+			$basketLine->amount = $request["amount"];
+			$basketLine->productPrice = $product->price;		
+			$basketLine->productName = $product->name;
+			$basket->lines[] = $basketLine;
+		}
+	}
+	
+	public function removeItemfromBasket()
+	{
+		//$basket = getBasket();
+		//$request = $this->getJsonInput();			
+		//unset($x[0]);
+	}
+	
+	public function completeOrder()
+	{
+		$basket = $this->basket();
+		//persist basket, unset session basket
+		$basketRepository.CompleteOrder($basket);
+		$_SESSION["basket"] = null;
+	}
+	
+	public function basket() {
+		if (!isset($_SESSION["basket"])) {
+			$basket = new Basket();
+			//TODO @BENI: User aus  Session abholen!
+			$user = new User();
+			$basket->userId = $user->userId;
+			$basket->deliveryStreet = $user->street;
+			$basket->deliveryPostCode = $user->postCode;
+			$basket->deliveryCity = $user->city;
+			$basket->invoiceStreet = $user->street;
+			$basket->invoicePostCode = $user->postCode;
+			$basket->invoiceCity = $user->city;		
+								
+			$_SESSION["basket"] = $basket;			
+		}
+		return $_SESSION["basket"];		
+	}
+	
+	public function getBasket() {
+		$this->renderJsonResult($this->basket());
+	}
 }
 
 $controllerFactory = new ControllerFactory();

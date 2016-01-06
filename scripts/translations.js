@@ -19,7 +19,14 @@
                 'login': 'Einloggen',
                 'submitLogin': 'Einloggen',
                 'loginSuccessful': 'Sie wurden erfolgreich eingeloggt.',
-                'loginFailed': 'Fehlgeschlagen, überprüfen Sie Email und Passwort.'
+                'loginFailed': 'Fehlgeschlagen, überprüfen Sie Email und Passwort.',
+				'name': 'Name',
+				'amount': 'Anzahl',
+				'price': 'Preis',
+				'basket': 'Warenkorb',
+				'detail': 'Detail',
+				'ingredients': 'Zusammensetzung',	
+				'addedItemToBasket': 'Artikel erfolgreich zum Warenkorb hinzugefügt!'
             });
 
             $translateProvider.translations('fr', {

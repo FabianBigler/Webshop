@@ -1,14 +1,34 @@
 <h1>{{'detail' | translate }}: {{product.name}}</h1>
+<div ng-repeat="statusAlert in statusAlerts">
+    <uib-alert close="removeAlert(statusAlert)" type="success">
+        {{ statusAlert.messageKey | translate }}
+    </uib-alert>
+</div>
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-lg-4">
+	<div class="col-xs-12 col-sm-4 col-lg-4">
 		<img class="img-responsive" src="{{rootUrl}}{{product.imgSmallPath}}" class="img-responsive" alt="{{product.name}}">
-	</div>
-	<div class="col-xs-12 col-sm-12 col-lg-8">
-		<h3>{{product.name}}</h3>
-		<p> {{product.description}}<p>
+	</div>		
+	<div class="col-xs-12 col-sm-8 col-lg-8">
+		<h3> {{product.description}}<h3>
+		<h3> {{'price' | translate}} </h3>
+		<div class="input-group col-sm-4">
+			<p> {{product.price}} CHF</p>
+		</div>
+		<div class="input-group col-sm-4">
+					  <input type="number" name="quantity" min="0" class="form-control autoselect text-right" 
+						ng-model="amount">
+					  <span class="input-group-btn">
+						<button class="btn btn-primary" type="submit" 
+						ng-disabled="!canAddItemToBasket()"
+						ng-click="addItemToBasket()">
+						  <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+						</button>
+					  </span>
+		</div>
+
 		<h3>{{'ingredients'| translate}}</h3>
 		<ul class="list-group">
 			<li ng-repeat="ingredient in product.ingredients" class="list-group-item"> {{ingredient.name}} </li>
-		</ul>
+		</ul>	
 	</div>
 </div>

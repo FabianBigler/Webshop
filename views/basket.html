@@ -1,0 +1,19 @@
+<h1>{{'basket' | translate }}</h1>
+<div class="row">
+	<table class="table table-striped">
+		<thead>
+		  <tr>
+			<th>{{'name' | translate}}</th>
+			<th>{{'amount' | translate}}</th>
+			<th>{{'price' | translate}}</th>			
+		  </tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="line in basket.lines">
+				<td>{{line.productName}}</td>
+				<td>{{line.amount}}</td>
+				<td>{{line.productPrice}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

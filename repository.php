@@ -16,7 +16,7 @@ class RepositoryBase {
 
 class BasketRepository extends RepositoryBase
 {	
-	public function AddLine($headerId, $productId, $amount)
+	public function addLine($headerId, $productId, $amount)
 	{
 		$this->initConnection();
 		$sql = "INSERT INTO `basketLine`(`headerId`, `productId`, `productPrice`, `amount`) 
@@ -30,9 +30,70 @@ class BasketRepository extends RepositoryBase
 		$stmt->execute();
 	}
 	
-	public function GetOrCreate($userId)
+	public function getOrCreate($userId)
 	{
+		$this->initConnection();
+		if($this->get($userId) == null)
+		{
+			//create a new basket!
+			
+		} else {
+			
+		}
+		//INSERT INTO `basketHeader`(`id`, `userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) 
+		//VALUES ([value-1],[value-2],[value-3],[value-4],[value-5],[value-6],[value-7],[value-8])
+	}
+	
+	public function completeOrder($basket)
+	{
+		if(count($basket->items) == 0)
+		{
+			trigger_error('No Basketlines in Basket!');
+		}
 		
+		$this->initConnection();
+		
+		
+	}
+	
+	
+	
+	//not fully functional!
+	private function get($userId)
+	{
+		$this->initConnection();
+		$sql = "SELECT `id`, `userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, 
+				`invoicePostCode`, `invoiceCity` WHERE userID = ?";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->bind_param('i', $userId);
+		if($stmt === false)
+		{
+			trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
+		}
+				$stmt->execute();		
+		$stmt->bind_result(	$row_id, 
+							$row_userid, 
+							$row_deliveryStreet, 
+							$row_deliveryPostCode, 
+							$row_deliveryCity, 
+							$row_invoiceStreet, 
+							$row_invoicePostCode, 
+							$row_invoiceCity);
+		
+		if($stmt->fetch())
+		{
+			$basket = new Basket();
+			$basket->id = $row_id;
+			$basket->userId = $row_userid;
+			$basket->deliveryStreet = $row_deliveryStreet;
+			$basket->deliveryPostCode = $row_deliveryPostCode;
+			$basket->deliveryCity = $row_deliveryCity;
+			$basket->invoiceStreet = $row_invoiceStreet;
+			$basket->invoicePostCode = $row_invoicePostCode;
+			$basket->invoiceCity = $row_invoiceCity;	
+			return $basket;
+		}
+		return null;	
 	}
 }
 
@@ -95,6 +156,17 @@ class ProductRepository extends RepositoryBase
 		}
 		return null;
 	}	
+	
+	public function getProduct($language, $id)
+	{
+		$products = $this->getProducts($language, $id);
+		$product = $products[0];
+		if(count($products) == 1)
+		{
+			$product = $products[0];
+			return $product;
+		}
+	}
 	
 	private function getProducts($language, $id = NULL)
 	{		

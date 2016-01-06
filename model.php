@@ -14,16 +14,20 @@ class Product extends EntityBase {
 }
 
 class Basket extends EntityBase {
+	public $userId;
 	public $deliveryStreet;
 	public $deliveryPostCode;
 	public $deliveryCity;
 	public $invoiceStreet;
 	public $invoicePostCode;
 	public $invoiceCity;
+	
+	public $lines =array();
 }
 
-class BasketItem extends EntityBase {
+class BasketLine extends EntityBase {
 	public $productId;
+	public $productName;
 	public $productPrice;
 	public $amount;
 }
