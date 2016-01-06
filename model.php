@@ -89,6 +89,11 @@ class User extends EntityBase {
         }
     }
     
+    public static function logout() {
+        $_SESSION["currentUser"] = null;
+        $_SESSION["basket"] = null;
+    }
+    
 	public function setPassword($password) {
 		$this->salt = bin2hex(openssl_random_pseudo_bytes(8));
 		$this->password = $this->getHash($password);

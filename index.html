@@ -38,18 +38,22 @@
             <div>
                 <ul class="nav navbar-nav navbar-right">
                     <li ui-sref-active="active">
-                        <a href ui-sref="overview">{{ 'overview' | translate }}</a>
+                        <a href ui-sref="overview">{{'overview' | translate}}</a>
                     </li>
                     <li ui-sref-active="active"
                         ng-show="app.userAuthenticated">
-                        <a href ui-sref="basket">{{ 'basket' | translate }}</a>
-                    </li>
-                    <li ui-sref-active="active">
-                        <a href ui-sref="user-register">{{ 'register' | translate }}</a>
+                        <a href ui-sref="basket">{{'basket' | translate}}</a>
                     </li>
                     <li ui-sref-active="active"
-                        ng-show="!app.userAuthenticated">
-                        <a href ui-sref="user-login">{{ 'login' | translate }}</a>
+                        ng-hide="app.userAuthenticated">
+                        <a href ui-sref="user-register">{{'register' | translate}}</a>
+                    </li>
+                    <li ui-sref-active="active"
+                        ng-hide="app.userAuthenticated">
+                        <a href ui-sref="user-login">{{'login' | translate}}</a>
+                    </li>
+                    <li ng-show="app.userAuthenticated">
+                        <a href="#" ng-click="app.logout()">{{'logout' | translate}}</a>
                     </li>
                 </ul>
             </div>

@@ -14,12 +14,16 @@ var maribelle;
             }
         );
 
+        self.logout = function() {
+            userService.logout();
+        }
+        
         self.changeLanguage = function (langKey) {
             $translate.use(langKey);
         };
     };
     
-    function UserServiceFactory($http, rootUrl) {
+    function UserServiceFactory($http, $state, rootUrl) {
         var user = {};
         var userInitialized = false;
         var userInitializationInProgress = false;
@@ -49,6 +53,15 @@ var maribelle;
                     }
 
                     return isSuccessful;
+                });
+            },
+            
+            logout: function(credentials) {
+                return logoutUser().then(function () {
+                    user = {};
+                    userInitialized = false;
+        
+                    $state.go(maribelle.product.overviewRoute, { reload: true });
                 });
             }
         };
@@ -84,6 +97,13 @@ var maribelle;
                 data: credentials,
             })
             .then(maribelle.mapData);
+        }
+        
+        function logoutUser(credentials) {
+            return $http({
+                url: rootUrl + '/controller.php?controller=user&action=logout',
+                method: 'POST'
+            });
         }
     }
     

@@ -91,6 +91,7 @@ class UserController extends ControllerBase {
         $this->registerAction("register", function() { $this->register(); });
         $this->registerAction("existsUser", function() { $this->existsUser(); });
         $this->registerAction("login", function() { $this->login(); });
+        $this->registerAction("logout", function() { $this->logout(); });
         $this->registerAction("getCurrentUser", function() { $this->getCurrentUser(); });
     }
 
@@ -115,6 +116,10 @@ class UserController extends ControllerBase {
         $success = User::login($this->userRepository, $request["email"], $request["password"]);
         
         $this->renderJsonResult($success);
+    }
+    
+    public function logout() {
+        User::logout();
     }
     
     public function getCurrentUser() {

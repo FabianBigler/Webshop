@@ -2,7 +2,7 @@
 <div class="row no-gutter">
 	<div class="col-lg-4 col-sm-6" ng-repeat="product in products">
 		<a href ui-sref="product-detail({id:product.id})" class="overview-box">
-		 <img src="{{rootUrl}}{{product.imgSmallPath}}" class="img-responsive" alt="{{product.name}}">
+		 <img ng-src="{{rootUrl}}{{product.imgSmallPath}}" class="img-responsive" alt="{{product.name}}">
             <div class="overview-box-caption">
                 <div class="overview-box-caption-content">
                     <div class="project-name">
