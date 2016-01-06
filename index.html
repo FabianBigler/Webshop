@@ -40,7 +40,8 @@
                     <li ui-sref-active="active">
                         <a href ui-sref="overview">{{ 'overview' | translate }}</a>
                     </li>
-                    <li ui-sref-active="active">
+                    <li ui-sref-active="active"
+                        ng-show="app.userAuthenticated">
                         <a href ui-sref="basket">{{ 'basket' | translate }}</a>
                     </li>
                     <li ui-sref-active="active">

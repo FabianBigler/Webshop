@@ -1,4 +1,5 @@
 <?php
+
 require_once("model.php");
 require_once("repository.php");
 require_once("helper.php");
@@ -42,6 +43,12 @@ class ControllerBase {
 	protected function registerAction($actionName, $action) {
 		$this->actions[$actionName] = $action;
 	}
+    
+    protected function verifyAuthenticated() {
+        if (User::isAuthenticated === false) {
+            throw new Exception("Not authorized");
+        }
+    }
 	
 	protected function renderJsonResult($result) {
 		header('Content-Type: application/json');
@@ -129,8 +136,9 @@ class BasketController extends ControllerBase {
 		$this->registerAction("getBasket", function() { $this->getBasket(); });			
     }
 	
-	public function addItemToBasket()
-	{
+	public function addItemToBasket() {
+        $this->verifyAuthenticated();
+        
 		$basket = $this->basket();
 		$request = $this->getJsonInput();		
 		$found = false;
@@ -153,15 +161,17 @@ class BasketController extends ControllerBase {
 		}
 	}
 	
-	public function removeItemfromBasket()
-	{
+	public function removeItemfromBasket() {
+        $this->verifyAuthenticated();
+        
 		//$basket = getBasket();
 		//$request = $this->getJsonInput();			
 		//unset($x[0]);
 	}
 	
-	public function completeOrder()
-	{
+	public function completeOrder() {
+        $this->verifyAuthenticated();
+        
 		$basket = $this->basket();
 		//persist basket, unset session basket
 		$basketRepository.CompleteOrder($basket);
@@ -170,19 +180,9 @@ class BasketController extends ControllerBase {
 	
 	public function basket() {
 		if (!isset($_SESSION["basket"])) {
-			$basket = new Basket();
-			//TODO @BENI: User aus  Session abholen!
-			$user = new User();
-			$basket->userId = $user->userId;
-			$basket->deliveryStreet = $user->street;
-			$basket->deliveryPostCode = $user->postCode;
-			$basket->deliveryCity = $user->city;
-			$basket->invoiceStreet = $user->street;
-			$basket->invoicePostCode = $user->postCode;
-			$basket->invoiceCity = $user->city;		
-								
-			$_SESSION["basket"] = $basket;			
+			$_SESSION["basket"] = new Basket(User::current());;			
 		}
+        
 		return $_SESSION["basket"];		
 	}
 	

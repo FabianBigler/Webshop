@@ -14,6 +14,18 @@ class Product extends EntityBase {
 }
 
 class Basket extends EntityBase {
+    function __construct($user) {
+        if (isset($user)) {
+            $this->userId = $user->userId;
+            $this->deliveryStreet = $user->street;
+            $this->deliveryPostCode = $user->postCode;
+            $this->deliveryCity = $user->city;
+            $this->invoiceStreet = $user->street;
+            $this->invoicePostCode = $user->postCode;
+            $this->invoiceCity = $user->city;	
+        }
+    }
+    
 	public $userId;
 	public $deliveryStreet;
 	public $deliveryPostCode;
@@ -56,6 +68,10 @@ class User extends EntityBase {
         else {
             return null;
         }
+    }
+    
+    public static function isAuthenticated() {
+        return User::current() !== null;
     }
     
     public static function login($userRepository, $email, $password) {

@@ -82,7 +82,7 @@ class BasketRepository extends RepositoryBase
 		
 		if($stmt->fetch())
 		{
-			$basket = new Basket();
+			$basket = new Basket(null);
 			$basket->id = $row_id;
 			$basket->userId = $row_userid;
 			$basket->deliveryStreet = $row_deliveryStreet;
@@ -130,8 +130,7 @@ class UserRepository extends RepositoryBase {
 	
     public function existsUserByEmail($email) {
         // TODO: Implement query correctly
-        $res = $this->getUserByEmail($email);
-        return $res !== null;
+        return $this->getUserByEmail($email) !== null;
     }
     
 	public function addUser($user) {
