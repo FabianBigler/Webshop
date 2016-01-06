@@ -22,6 +22,17 @@
 		{
 		
 		}
+		
+		$scope.getTotal = function() {
+			if(!$scope.basket.lines) { 
+				return 0;
+			}
+			
+			return $scope.basket.lines.reduce(function(acc, line) { 
+				return acc + line.productPrice * line.amount; 
+			}, 0);
+		}
+		
     }
 
     basket.basketRoute = {
