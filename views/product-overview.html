@@ -1,11 +1,4 @@
 <h1>{{'overview' | translate }}</h1>
-<!--<div class="list-group">
-    <div class="list-group-item" ng-repeat="product in products">
-        {{product.id}} {{product.name}} {{product.name}}
-        <img src="{{rootUrl}}{{product.imgSmallPath}}" title="{{product.name}}" />
-    </div>
-</div>-->
-
 <div class="row no-gutter">
 	<div class="col-lg-4 col-sm-6" ng-repeat="product in products">
 		<a href ui-sref="product-detail({id:product.id})" class="overview-box">
@@ -15,7 +8,7 @@
                     <div class="project-name">
                         {{product.name}}
                     </div>
-					<div class="project-category text-faded">
+					<div class="project-name text-faded">
                         {{product.shortDescription}}
                     </div>
                 </div>
@@ -23,97 +16,3 @@
 		</a>
 	</div>
 </div>
-
-<!--<div class="row no-gutter">
-    <div class="col-lg-4 col-sm-6">
-        <a href="#" class="overview-box">
-            <img src="assets/img/portfolio/1.jpg" class="img-responsive" alt="">
-            <div class="overview-box-caption">
-                <div class="overview-box-caption-content">
-                    <div class="project-category text-faded">
-                        Category
-                    </div>
-                    <div class="project-name">
-                        Project Name
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-4 col-sm-6">
-        <a href="#" class="overview-box">
-            <img src="assets/img/portfolio/2.jpg" class="img-responsive" alt="">
-            <div class="overview-box-caption">
-                <div class="overview-box-caption-content">
-                    <div class="project-category text-faded">
-                        Category
-                    </div>
-                    <div class="project-name">
-                        Project Name
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-4 col-sm-6">
-        <a href="#" class="overview-box">
-            <img src="assets/img/portfolio/3.jpg" class="img-responsive" alt="">
-            <div class="overview-box-caption">
-                <div class="overview-box-caption-content">
-                    <div class="project-category text-faded">
-                        Category
-                    </div>
-                    <div class="project-name">
-                        Project Name
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-4 col-sm-6">
-        <a href="#" class="overview-box">
-            <img src="assets/img/portfolio/4.jpg" class="img-responsive" alt="">
-            <div class="overview-box-caption">
-                <div class="overview-box-caption-content">
-                    <div class="project-category text-faded">
-                        Category
-                    </div>
-                    <div class="project-name">
-                        Project Name
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-4 col-sm-6">
-        <a href="#" class="overview-box">
-            <img src="assets/img/portfolio/5.jpg" class="img-responsive" alt="">
-            <div class="overview-box-caption">
-                <div class="overview-box-caption-content">
-                    <div class="project-category text-faded">
-                        Category
-                    </div>
-                    <div class="project-name">
-                        Project Name
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-4 col-sm-6">
-        <a href="#" class="overview-box">
-            <img src="assets/img/portfolio/6.jpg" class="img-responsive" alt="">
-            <div class="overview-box-caption">
-                <div class="overview-box-caption-content">
-                    <div class="project-category text-faded">
-                        Category
-                    </div>
-                    <div class="project-name">
-                        Project Name
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
--->

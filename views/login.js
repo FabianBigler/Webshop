@@ -2,7 +2,7 @@
 
 (function (user) {
 
-    function LoginViewModel($scope, $http, rootUrl) {
+    function LoginViewModel($scope, userService) {
         $scope.credentials = {};
         $scope.status = {};
         
@@ -12,24 +12,16 @@
         };
         
         $scope.submit = function() {
-            loginUser($scope.credentials).then(function(isSuccessful) {
+            userService.login($scope.credentials).then(function(isSuccessful) {
                 if (isSuccessful === true) {
                     $scope.status = { type: 'success', messageKey: 'loginSuccessful', show: true };
+                    $scope.credentials = {};
                 }
                 else {
                     $scope.status = { type: 'danger', messageKey: 'loginFailed', show: true };
                 }
             });
         };
-        
-        function loginUser(credentials) {
-            return $http({
-                url: rootUrl + '/controller.php?controller=user&action=login',
-                method: 'POST',
-                data: credentials,
-            })
-            .then(maribelle.mapData);
-        }
     }
 
     user.loginRoute = {
