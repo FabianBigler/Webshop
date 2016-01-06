@@ -1,11 +1,9 @@
 <?php
-class EntityBase
-{
+class EntityBase {
 	public $id;
 }
 
-class Product extends EntityBase
-{
+class Product extends EntityBase {
     public $name;
     public $price;
     public $imgSmallPath;
@@ -14,8 +12,7 @@ class Product extends EntityBase
 	public $ingredients;
 }
 
-class Basket extends EntityBase
-{
+class Basket extends EntityBase {
 	public $deliveryStreet;
 	public $deliveryPostCode;
 	public $deliveryCity;
@@ -24,8 +21,7 @@ class Basket extends EntityBase
 	public $invoiceCity;
 }
 
-class BasketItem extends EntityBase
-{
+class BasketItem extends EntityBase {
 	public $productId;
 	public $productPrice;
 	public $amount;
@@ -52,7 +48,7 @@ class User extends EntityBase {
 	}
 	
 	public function getHash($password) {
-		return hash("sha256", $password + $this->salt);
+		return hash("sha256", $password . $this->salt);
 	}
     
     public function applyValuesFromArray($newValues) {
@@ -64,8 +60,8 @@ class User extends EntityBase {
     }
 }
 
-class Ingredient extends EntityBase
-{
+class Ingredient extends EntityBase {
 	public $name;	
 }
- ?>
+
+?>

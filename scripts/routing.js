@@ -10,7 +10,8 @@
             $stateProvider
                 .state(maribelle.product.overviewRoute)
                 .state(maribelle.product.detailRoute)
-                .state(maribelle.user.registerRoute);
+                .state(maribelle.user.registerRoute)
+                .state(maribelle.user.loginRoute);
         });
 
 })(maribelle.routing || (maribelle.routing = {}));

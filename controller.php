@@ -92,17 +92,13 @@ class UserController extends ControllerBase {
     }
     
     public function login()	{
-        $email = $_POST["email"];
-        $pwd = $_POST["password"];			
-        $user = $userRepository.getUserByEmail($email);						
-        if(ISSET($user)) {				
-            if ($user->password === $user->getHash($pwd))
-            {
-                $this->renderJsonResult(true);
-            } else {
-                $this->renderJsonResult(false);
-            }				
-        } else {
+        $request = $this->getJsonInput();
+        $user = $this->userRepository->getUserByEmail($request["email"]);	
+        					
+        if (isset($user) && $user->password === $user->getHash($request["password"])) {	
+            $this->renderJsonResult(true);
+        }
+        else {
             $this->renderJsonResult(false);
         }
     }

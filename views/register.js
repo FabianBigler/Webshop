@@ -4,7 +4,7 @@
 
     function RegisterViewModel($scope, $http, rootUrl) {
         $scope.newUser = {};
-        $scope.statusAlerts = [];
+        $scope.status = {};
                 
         $scope.passwordsMatch = function() {
             return $scope.newUser.password
@@ -19,13 +19,9 @@
         
         $scope.submit = function() {
             registerUser($scope.newUser).then(function(res) {
-                $scope.statusAlerts.push({ type: 'success', messageKey: 'registrationSuccessful' });
+                $scope.status = { type: 'success', messageKey: 'registrationSuccessful', show: true };
                 $scope.newUser = {};
             });
-        };
-                
-        $scope.removeAlert = function(statusAlert) {
-            $scope.statusAlerts.splice($scope.statusAlerts.indexOf(statusAlert), 1);
         };
         
         function registerUser(newUser) {

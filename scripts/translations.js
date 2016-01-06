@@ -15,7 +15,11 @@
                 'password': 'Passwort',
                 'passwordConfirm': 'Passwort bestätigen',
                 'submitRegistration': 'Registrieren',
-                'registrationSuccessful': 'Sie wurden erfolgreich registriert.'
+                'registrationSuccessful': 'Sie wurden erfolgreich registriert.',
+                'login': 'Einloggen',
+                'submitLogin': 'Einloggen',
+                'loginSuccessful': 'Sie wurden erfolgreich eingeloggt.',
+                'loginFailed': 'Fehlgeschlagen, überprüfen Sie Email und Passwort.'
             });
 
             $translateProvider.translations('fr', {

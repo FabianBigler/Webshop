@@ -1,9 +1,8 @@
 <h1>{{'register' | translate}}</h1>
-<div ng-repeat="statusAlert in statusAlerts">
-    <uib-alert close="removeAlert(statusAlert)" type="success">
-        {{ statusAlert.messageKey | translate }}
-    </uib-alert>
-</div>
+<uib-alert close="status.show = false" type="{{status.type}}" 
+           ng-show="status.show === true">
+    {{ status.messageKey | translate }}
+</uib-alert>
 
 <div class="row">
     <div class="col-xs-12 col-sm-8 col-lg-6">
