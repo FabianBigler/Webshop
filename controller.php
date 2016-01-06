@@ -45,7 +45,7 @@ class ControllerBase {
 	}
     
     protected function verifyAuthenticated() {
-        if (User::isAuthenticated === false) {
+        if (User::isAuthenticated() === false) {
             throw new Exception("Not authorized");
         }
     }
