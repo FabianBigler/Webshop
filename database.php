@@ -1,4 +1,5 @@
 <?php
+
 class Database {
     public function getConnection() {
 		$servername = 'fabigler.mysql.db.internal';
@@ -13,4 +14,5 @@ class Database {
         return $conn;
     }
 }
+
 ?>

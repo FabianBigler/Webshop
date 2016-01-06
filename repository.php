@@ -1,12 +1,11 @@
 <?php
+
 include_once 'database.php';
 include_once 'model.php';
 
-class RepositoryBase
-{
+class RepositoryBase {
 	protected $conn;
-	protected function initConnection()
-	{
+	protected function initConnection()	{
 		$db = new Database();
 		$this->conn = $db->getConnection();
 		if ($this->conn->connect_error) {

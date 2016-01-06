@@ -13,11 +13,10 @@
 			return $http({
                 url: rootUrl + '/controller.php?controller=product&action=get',
                 method: 'GET',
-                params: {productId: id},
+                params: { productId: id },
             })
 			.then(maribelle.mapData);
 		}
-	
     }
 
     product.detailRoute = {

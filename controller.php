@@ -1,4 +1,5 @@
 <?php
+
 require_once("model.php");
 require_once("repository.php");
 require_once("helper.php");
@@ -65,12 +66,9 @@ class ProductController extends ControllerBase {
 		$this->renderJsonResult($result);
 	}
 	
-	public function get()
-	{
+	public function get() {
 		$productId = htmlspecialchars($_GET["productId"]);
-		$result = $this->productRepository->
-					getProductWithIngredients(
-						WebshopContext::getLanguage(), $productId);
+		$result = $this->productRepository->getProductWithIngredients(WebshopContext::getLanguage(), $productId);
 		$this->renderJsonResult($result);
 	}
 }
