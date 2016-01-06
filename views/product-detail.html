@@ -1,1 +1,14 @@
-<h1>Detail</h1>
+<h1>{{'detail' | translate }}: {{product.name}}</h1>
+<div class="row">
+	<div class="col-xs-12 col-sm-12 col-lg-4">
+		<img class="img-responsive" src="{{rootUrl}}{{product.imgSmallPath}}" class="img-responsive" alt="{{product.name}}">
+	</div>
+	<div class="col-xs-12 col-sm-12 col-lg-8">
+		<h3>{{product.name}}</h3>
+		<p> {{product.description}}<p>
+		<h3>{{'ingredients'| translate}}</h3>
+		<ul class="list-group">
+			<li ng-repeat="ingredient in product.ingredients" class="list-group-item"> {{ingredient.name}} </li>
+		</ul>
+	</div>
+</div>

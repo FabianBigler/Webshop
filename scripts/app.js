@@ -12,7 +12,7 @@ var maribelle;
     };
     
     angular.module('maribelle', ['maribelle.routing', 'maribelle.translations', 'ui.bootstrap', 'ngAnimate'])
-        .constant("rootUrl", "/bm")
+        .constant("rootUrl", "/fab")
         .controller('AppViewModel', AppViewModel)
         .run(function($rootScope, $rootElement, rootUrl) {
             $rootScope.$ignore = function() { return false };
