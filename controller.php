@@ -131,10 +131,10 @@ class BasketController extends ControllerBase {
 	private $basketRepository;
 	private $productRepository;
     
-    function __construct($basketRepository, $productRepository) {
+	function __construct($basketRepository, $productRepository) {
         parent::__construct("basket");
         $this->basketRepository = $basketRepository;
-		$this->productRepository = $productRepository;	
+		$this->productRepository = $productRepository;		
         $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
         $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
 		$this->registerAction("completeOrder", function() { $this->completeOrder(); });
@@ -194,10 +194,10 @@ class BasketController extends ControllerBase {
 		if(count($basket->lines) == 0)
 		{
 			throw new Exception("Basket is empty");
-		}
-			
+		}						
+		
 		//persist basket, unset session basket
-		$basketRepository->completeOrder($basket);
+		$this->basketRepository->completeOrder($basket);
 		$_SESSION["basket"] = null;
 	}
 	

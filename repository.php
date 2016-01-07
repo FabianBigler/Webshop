@@ -15,7 +15,36 @@ class RepositoryBase {
 }
 
 class BasketRepository extends RepositoryBase
-{	
+{		
+	public function TEST()
+	{
+		return 0;
+	}
+
+	public function completeOrder($basket)
+	{
+		if(count($basket->lines) == 0)
+		{
+			throw new Exception("Basket is empty");
+		}			
+		
+		$this->initConnection();			
+		$sql = 'INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) VALUES (?,?,?,?,?,?,?)';	
+		$stmt = $this->conn->prepare($sql) or die($this->conn->error);      		
+		$stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
+		$stmt->execute();
+		//how to get new id?
+
+		
+		foreach($basket.lines as $line)
+		{
+			addLine($basket.id, $line.productId, $amount);
+		}
+		
+		//foreach lines!!
+		
+	}
+	
 	public function addLine($headerId, $productId, $amount)
 	{
 		$this->initConnection();
@@ -30,6 +59,7 @@ class BasketRepository extends RepositoryBase
 		$stmt->execute();
 	}
 	
+	/*
 	public function getOrCreate($userId)
 	{
 		$this->initConnection();
@@ -44,22 +74,12 @@ class BasketRepository extends RepositoryBase
 		//VALUES ([value-1],[value-2],[value-3],[value-4],[value-5],[value-6],[value-7],[value-8])
 	}
 	
-	public function completeOrder($basket)
-	{
-		if(count($basket->items) == 0)
-		{
-			trigger_error('No Basketlines in Basket!');
-		}
-		
-		$this->initConnection();		
-		
-	}
 	
-	
+
 	
 	//not fully functional!
 	private function get($userId)
-	{
+	{	
 		$this->initConnection();
 		$sql = "SELECT `id`, `userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, 
 				`invoicePostCode`, `invoiceCity` WHERE userID = ?";
@@ -94,6 +114,7 @@ class BasketRepository extends RepositoryBase
 		}
 		return null;	
 	}
+	*/
 }
 
 class UserRepository extends RepositoryBase {

@@ -25,7 +25,8 @@
         };		
 
 		$scope.canCompleteOrder = function() {
-            return ($scope.basket.lines.length > 0);
+			
+            return ($scope.basket.lines && $scope.basket.lines.length > 0);
         };		
 		
 		$scope.completeOrder = function() {
