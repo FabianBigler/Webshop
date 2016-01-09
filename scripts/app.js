@@ -3,25 +3,44 @@
 var maribelle;
     (function (maribelle) {
     
-    function AppViewModel($scope, $translate, userService) {
+    function AppViewModel($scope, $state, $translate, $cookies, userService) {
         var self = this;
-        
+
         $scope.$watchCollection(
-            function() { return userService.currentUser() },
-            function() { 
-                self.userName = userService.currentUser().name;
+            function() { return userService.currentUser(); },
+            function(user) { 
+                self.userName = user.givenname + ' ' + user.surname;
                 self.userAuthenticated = userService.isAuthenticated();
             }
         );
-
+        
         self.logout = function() {
             userService.logout();
         }
         
-        self.changeLanguage = function (langKey) {
+        self.changeLang = function (langKey, reloadPage) {
+            if (reloadPage == void(0)) reloadPage = true;
             $translate.use(langKey);
+            self.currentLang = langKey;
+            setCurrentLangToCookie(langKey);
+            
+            if (reloadPage === true) {
+                $state.reload();
+            }
         };
-    };
+       
+        setDefaultLang();
+        
+        function setCurrentLangToCookie(currentLang) {
+            $cookies.put('currentLang', currentLang);
+        }
+        
+        function setDefaultLang() {
+            var langByCookie = $cookies.get('currentLang');
+            var langByClient = $translate.use();
+            self.changeLang(langByCookie || langByClient, false);
+        }
+    }
     
     function UserServiceFactory($http, $state, rootUrl) {
         var user = {};
@@ -121,7 +140,7 @@ var maribelle;
         }; 
     }
     
-    angular.module('maribelle', ['maribelle.routing', 'maribelle.translations', 'ui.bootstrap', 'ngAnimate'])
+    angular.module('maribelle', ['maribelle.routing', 'maribelle.translations', 'ui.bootstrap', 'ngAnimate', 'ngCookies'])
         .constant("rootUrl", "")
         .controller('AppViewModel', AppViewModel)
         .service('userService', UserServiceFactory)

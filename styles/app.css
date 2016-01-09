@@ -75,10 +75,38 @@ aside {
     background-color: transparent;
 }
 
+.navbar-default .navbar-text {
+    color: #000000;
+}
+
+.navbar-default #langswitch .dropdown-menu {
+    width: 40px;
+}
+
+.navbar-default #langswitch .dropdown-menu li a {
+    cursor: pointer; 
+}
+
+@media(min-width:0px) {
+    .navbar-default {
+        border-color: #000;
+    }
+    
+    .navbar-default #langswitch {
+        float: left;
+        margin-bottom: 6px;
+    }
+}
+
 @media(min-width:768px) {
     .navbar-default {
-        border-color: rgba(255,255,255,.6);
-        background-color: rgba(255,255,255,.4);
+        border-color: rgba(255,255,255,.8);
+        background-color: rgba(255,255,255,.6);
+    }
+    
+    .navbar-default #langswitch {
+        top: 6px;
+        float: right;
     }
 }
 
@@ -115,6 +143,10 @@ main {
     max-width: 650px;
 }
 
+.overview-box img {
+    width: 100%;
+}
+
 .overview-box .overview-box-caption {
     display: block;
     position: absolute;
@@ -138,20 +170,20 @@ main {
     transform: translateY(-50%);
 }
 
-.overview-box .overview-box-caption .overview-box-caption-content .project-category,
-.overview-box .overview-box-caption .overview-box-caption-content .project-name {
+.overview-box .overview-box-caption .overview-box-caption-content .project-name,
+.overview-box .overview-box-caption .overview-box-caption-content .project-details {
     padding: 0 15px;
     font-family: 'Open Sans','Helvetica Neue',Arial,sans-serif;
 }
 
-.overview-box .overview-box-caption .overview-box-caption-content .project-category {
+.overview-box .overview-box-caption .overview-box-caption-content .project-name {
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
 }
 
-.overview-box .overview-box-caption .overview-box-caption-content .project-name {
-    font-size: 18px;
+.overview-box .overview-box-caption .overview-box-caption-content .project-details {
+    font-size: 14px;
 }
 
 .overview-box:hover .overview-box-caption {
@@ -159,12 +191,12 @@ main {
 }
 
 @media(min-width:768px) {
-    .overview-box .overview-box-caption .overview-box-caption-content .project-category {
-        font-size: 16px;
-    }
-
     .overview-box .overview-box-caption .overview-box-caption-content .project-name {
         font-size: 22px;
+    }
+    
+    .overview-box .overview-box-caption .overview-box-caption-content .project-details {
+        font-size: 16px;
     }
 }
 

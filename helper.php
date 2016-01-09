@@ -2,8 +2,8 @@
 
 class WebshopContext {
     public static function getLanguage() {
-        if(isset($_COOKIE[$language])) {
-            return $_COOKIE[$language];
+        if(isset($_COOKIE["currentLang"])) {
+            return strtoupper($_COOKIE["currentLang"]);
         } 
         else {
             return 'DE';
