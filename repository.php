@@ -1,7 +1,7 @@
 <?php
 
-include_once 'database.php';
-include_once 'model.php';
+require_once "helper.php";
+require_once "model.php";
 
 class RepositoryBase {
 	protected $conn;
@@ -14,17 +14,13 @@ class RepositoryBase {
 	}
 }
 
-class BasketRepository extends RepositoryBase
-{		
-	public function TEST()
-	{
+class BasketRepository extends RepositoryBase {		
+	public function TEST() {
 		return 0;
 	}
 
-	public function completeOrder($basket)
-	{
-		if(count($basket->lines) == 0)
-		{
+	public function completeOrder($basket) {
+		if(count($basket->lines) == 0) {
 			throw new Exception("Basket is empty");
 		}			
 		
@@ -33,8 +29,8 @@ class BasketRepository extends RepositoryBase
 		$stmt = $this->conn->prepare($sql) or die($this->conn->error);      		
 		$stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
 		$stmt->execute();
-		//how to get new id?
 
+		//how to get new id?
 		
 		foreach($basket.lines as $line)
 		{
@@ -42,7 +38,6 @@ class BasketRepository extends RepositoryBase
 		}
 		
 		//foreach lines!!
-		
 	}
 	
 	public function addLine($headerId, $productId, $amount)
@@ -162,15 +157,12 @@ class UserRepository extends RepositoryBase {
 	}
 }
 
-class ProductRepository extends RepositoryBase
-{		
-	public function getAll($language)
-	{
+class ProductRepository extends RepositoryBase {		
+	public function getAll($language) {
 		return $this->getProducts($language);
 	}
 	
-	public function getProductWithIngredients($language, $id)
-	{		
+	public function getProductWithIngredients($language, $id) {		
 		$products = $this->getProducts($language, $id);
 		if(count($products) == 1)
 		{
@@ -181,8 +173,7 @@ class ProductRepository extends RepositoryBase
 		return null;
 	}	
 	
-	public function getProduct($language, $id)
-	{
+	public function getProduct($language, $id) {
 		$products = $this->getProducts($language, $id);
 		$product = $products[0];
 		if(count($products) == 1)
@@ -192,8 +183,7 @@ class ProductRepository extends RepositoryBase
 		}
 	}
 	
-	private function getProducts($language, $id = NULL)
-	{		
+	private function getProducts($language, $id = NULL) {		
 		$this->initConnection();
 		$sql = "SELECT product.id, name, price, imgSmallPath, description, 
 		`short-description` FROM `product` INNER JOIN `productText` 
@@ -202,15 +192,17 @@ class ProductRepository extends RepositoryBase
 		
 		if(isset($id)) {
 			$sql = $sql . ' AND `product`.`id`=?)';
-		} else {
+		} 
+        else {
 			$sql = $sql . ')';
 		}
+        
 		$stmt = $this->conn->prepare($sql);		
-		
 		
 		if(isset($id)) {
 			$stmt->bind_param('ss', htmlspecialchars($language), intval($id));
-		} else {
+		} 
+        else {
 			$stmt->bind_param('s', htmlspecialchars($language));
 		}
 		
@@ -220,48 +212,43 @@ class ProductRepository extends RepositoryBase
 		
 		$stmt->execute();		
 		$stmt->bind_result($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription);
-		while($stmt->fetch())
-		{
-			//if(isset($row_name))
-			//{				
-				$product = new Product();
-				$product->id = $row_id;
-				$product->name = utf8_encode($row_name);
-				$product->price = $row_price;
-				$product->imgSmallPath = $row_img;
-				$product->description = utf8_encode($row_description);
-				$product->shortDescription = utf8_encode($row_shortDescription);
-				$products[] = $product;
-			//}
+		while($stmt->fetch()) {
+            $product = new Product();
+            $product->id = $row_id;
+            $product->name = utf8_encode($row_name);
+            $product->price = $row_price;
+            $product->imgSmallPath = $row_img;
+            $product->description = utf8_encode($row_description);
+            $product->shortDescription = utf8_encode($row_shortDescription);
+            $products[] = $product;
 		}
+        
 		return $products;
-		//echo json_encode($products);		
 	}
 	
-	private function getIngredients($language, $productId)
-	{
+	private function getIngredients($language, $productId) {
 		$this->initConnection();		
 		$sql = "SELECT ingredient.id, ingredient.name FROM `productIngredient` 
 				INNER JOIN ingredient ON (ingredient.id=`productIngredient`.`ingredient-id` 
 				AND ingredient.`language-code`=? AND `productIngredient`.`product-id`=?) ORDER BY `productIngredient`.`position`";
-		//echo $sql;
-		$stmt = $this->conn->prepare($sql);
+		
+        $stmt = $this->conn->prepare($sql);
 		if($stmt === false) {
 		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
 		}
-		//echo 'id:' . $productId;
-		//echo 'lang:' .$language;
+        
 		$stmt->bind_param('si', htmlspecialchars($language), intval($productId));
 		$stmt->execute();		
 		$stmt->bind_result($row_id, $row_name);
-		while($stmt->fetch())
-		{
+		while($stmt->fetch()) {
 			$ingredient = new Ingredient();
 			$ingredient->id = $row_id;
 			$ingredient->name = utf8_encode($row_name);
 			$ingredients[] = $ingredient;
 		}	
+        
 		return $ingredients;		
 	}
 }
+
 ?>

@@ -1,8 +1,8 @@
 <?php
 
-require_once("model.php");
-require_once("repository.php");
-require_once("helper.php");
+require_once "model.php";
+require_once "helper.php";
+require_once "repository.php";
 
 session_start();
 

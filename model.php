@@ -33,8 +33,8 @@ class Basket extends EntityBase {
 	public $invoiceStreet;
 	public $invoicePostCode;
 	public $invoiceCity;
-	
-	public $lines =array();
+
+	public $lines = array();
 }
 
 class BasketLine extends EntityBase {
@@ -91,7 +91,6 @@ class User extends EntityBase {
     
     public static function logout() {
         $_SESSION["currentUser"] = null;
-        $_SESSION["basket"] = null;
     }
     
 	public function setPassword($password) {
