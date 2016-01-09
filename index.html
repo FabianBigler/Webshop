@@ -75,8 +75,9 @@
                         {{app.currentLang | translate}} <span class="caret"></span>
                     </button>
                     <ul uib-dropdown-menu role="menu">
-                        <li role="menuitem"><a ng-click="app.changeLang('de')">{{'deLong' | translate}}</a></li>
-                        <li role="menuitem"><a ng-click="app.changeLang('fr')">{{'frLong' | translate}}</a></li>
+                        <li role="menuitem" ng-repeat="language in app.languages">
+                            <a ng-click="app.changeLang(language.code)">{{language.name}}</a>
+                        </li>
                     </ul>
                 </div>
             </div>

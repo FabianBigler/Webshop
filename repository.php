@@ -157,6 +157,27 @@ class UserRepository extends RepositoryBase {
 	}
 }
 
+class LanguageRepository extends RepositoryBase {
+    public function getAll() {
+        $this->initConnection();
+        
+		$stmt = $this->conn->prepare("SELECT `code`, `name` FROM `language`");		
+		$stmt->execute();		
+		$stmt->bind_result($row_code, $row_name);
+		
+        $result = array();
+		while ($stmt->fetch()) {
+			$lang = new Language();
+			$lang->code = utf8_encode($row_code);
+			$lang->name = utf8_encode($row_name);
+            
+            $result[] = $lang;
+		}
+        
+		return $result;	
+    }
+}
+
 class ProductRepository extends RepositoryBase {		
 	public function getAll($language) {
 		return $this->getProducts($language);

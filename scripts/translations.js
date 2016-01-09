@@ -4,7 +4,7 @@
 
     angular.module('maribelle.translations', ['pascalprecht.translate'])
         .config(function ($translateProvider) {
-            $translateProvider.translations('de', {
+            $translateProvider.translations('DE', {
                 'overview': 'Sortiment',
                 'register': 'Registrieren',
                 'email': 'Email',
@@ -35,13 +35,48 @@
 				'deliveryAddress': 'Lieferadresse',
 				'invoiceAddress': 'Rechnungsadresse',
 				'completeOrder': 'Bestellung abschliessen',
-                'fr': 'FR',
-				'de': 'DE',
-                'frLong': 'Französisch',
-				'deLong': 'Deutsch'
+				'FR': 'Français',
+				'DE': 'Deutsch',
+				'EN': 'English'
+            });
+            
+            $translateProvider.translations('EN', {
+                'overview': 'Overview',
+                'register': 'Register',
+                'email': 'Email',
+                'street': 'Street',
+                'postCodeCity': 'Postcode / City',
+                'postCode': 'Postcode',
+                'city': 'City',
+                'password': 'Password',
+                'passwordConfirm': 'Password confirmation',
+                'submitRegistration': 'Register',
+                'registrationSuccessful': 'You have been successfully registered.',
+                'login': 'Login',
+                'logout': 'Logout',
+                'SignedInAs': 'Signed in as',
+                'submitLogin': 'Login',
+                'loginSuccessful': 'Vous avez été connecté avec succès.',
+                'loginFailed': 'Échec, consulter vos e-mail et mot de passe.',
+				'name': 'Name',
+				'amount': 'Amount',
+				'price': 'Price',
+				'basket': 'Basket',
+				'detail': 'Detail',
+				'ingredients': 'Ingredients',	
+				'addedItemToBasket': 'Item successfully added to basket!',
+				'givenname': 'Givenname',
+				'surname': 'Surname',
+				'total': 'Total',
+				'deliveryAddress': 'Delivery address',
+				'invoiceAddress': 'Invoice address',
+				'completeOrder': 'Complete Order',
+				'FR': 'Français',
+				'DE': 'Deutsch',
+				'EN': 'English'
             });
 
-            $translateProvider.translations('fr', {
+            $translateProvider.translations('FR', {
                 'overview': 'Vue d\'ensemble',
                 'register': 'Registre',
                 'email': 'Émail',
@@ -72,10 +107,9 @@
 				'deliveryAddress': 'Adresse de livraison',
 				'invoiceAddress': 'Adresse de facturation',
 				'completeOrder': 'Terminer la commande',
-				'fr': 'FR',
-				'de': 'DE',
-				'frLong': 'Français',
-				'deLong': 'Allemand'
+				'FR': 'Français',
+				'DE': 'Deutsch',
+				'EN': 'English'
             });
 
             $translateProvider.preferredLanguage('de');

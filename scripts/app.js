@@ -1,9 +1,9 @@
 'use strict';
 
 var maribelle;
-    (function (maribelle) {
+(function (maribelle) {
     
-    function AppViewModel($scope, $state, $translate, $cookies, userService) {
+    function AppViewModel($scope, $state, $translate, $http, $cookies, rootUrl, userService) {
         var self = this;
 
         $scope.$watchCollection(
@@ -18,11 +18,11 @@ var maribelle;
             userService.logout();
         }
         
-        self.changeLang = function (langKey, reloadPage) {
+        self.changeLang = function (langCode, reloadPage) {
             if (reloadPage == void(0)) reloadPage = true;
-            $translate.use(langKey);
-            self.currentLang = langKey;
-            setCurrentLangToCookie(langKey);
+            $translate.use(langCode);
+            self.currentLang = langCode;
+            setCurrentLangToCookie(langCode);
             
             if (reloadPage === true) {
                 $state.reload();
@@ -30,6 +30,7 @@ var maribelle;
         };
        
         setDefaultLang();
+        getAllLanguages().then(function(languages) { self.languages = languages; });
         
         function setCurrentLangToCookie(currentLang) {
             $cookies.put('currentLang', currentLang);
@@ -39,6 +40,14 @@ var maribelle;
             var langByCookie = $cookies.get('currentLang');
             var langByClient = $translate.use();
             self.changeLang(langByCookie || langByClient, false);
+        }
+        
+        function getAllLanguages() {
+            return $http({
+                url: rootUrl + '/controller.php?controller=user&action=languages',
+                method: 'GET'
+            })
+            .then(maribelle.mapData);
         }
     }
     

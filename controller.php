@@ -11,7 +11,7 @@ class ControllerFactory {
 	
 	function __construct() {
 		$this->registerController(new ProductController(new ProductRepository()));
-		$this->registerController(new UserController(new UserRepository()));
+		$this->registerController(new UserController(new UserRepository(), new LanguageRepository()));
 		$this->registerController(new BasketController(new BasketRepository(), new ProductRepository()));
 	}
 	
@@ -84,15 +84,18 @@ class ProductController extends ControllerBase {
 
 class UserController extends ControllerBase {
 	private $userRepository;
+	private $languageRepository;
     
-    function __construct($userRepository) {
+    function __construct($userRepository, $languageRepository) {
         parent::__construct("user");
         $this->userRepository = $userRepository;
+        $this->languageRepository = $languageRepository;
         $this->registerAction("register", function() { $this->register(); });
         $this->registerAction("existsUser", function() { $this->existsUser(); });
         $this->registerAction("login", function() { $this->login(); });
         $this->registerAction("logout", function() { $this->logout(); });
         $this->registerAction("getCurrentUser", function() { $this->getCurrentUser(); });
+        $this->registerAction("languages", function() { $this->languages(); });
     }
 
     public function register() {
@@ -125,6 +128,11 @@ class UserController extends ControllerBase {
     public function getCurrentUser() {
         $this->renderJsonResult(User::current());
     }
+        
+    public function languages() {
+		$result = $this->languageRepository->getAll();
+		$this->renderJsonResult($result);
+	}
 }
 
 class BasketController extends ControllerBase {	

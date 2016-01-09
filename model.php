@@ -13,6 +13,10 @@ class Product extends EntityBase {
 	public $ingredients;
 }
 
+class Ingredient extends EntityBase {
+	public $name;	
+}
+
 class Basket extends EntityBase {
     function __construct($user) {
         if (isset($user)) {
@@ -117,8 +121,9 @@ class User extends EntityBase {
 	}
 }
 
-class Ingredient extends EntityBase {
-	public $name;	
+class Language {
+	public $code;
+	public $name;
 }
 
 ?>
