@@ -40,11 +40,11 @@ class RepositoryBase {
     }
 }
 
-class ProductRepository extends RepositoryBase {		
-	public function getAll($language) {
-		$sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
+class ProductRepository extends RepositoryBase {        
+    public function getAll($language) {
+        $sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
                 INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `language-code`=?)";
-		
+        
         return $this->query($sql, function($stmt) use($language) {
             $stmt->bind_param('s', $language);
             $stmt->execute();
@@ -57,12 +57,12 @@ class ProductRepository extends RepositoryBase {
             
             return $result;
         });
-	}
+    }
     
     public function getById($productId, $language) {
-		$sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
+        $sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
                 INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `product`.`id`=? AND `language-code`=?)";
-		
+        
         return $this->query($sql, function($stmt) use($productId, $language) {
             $stmt->bind_param('is', $productId, $language);
             $stmt->execute();
@@ -75,15 +75,15 @@ class ProductRepository extends RepositoryBase {
             
             return $result;
         });
-	}
-	
+    }
+    
     public function getIngredients($productId, $language) {
-		$sql = "SELECT ingredient.id, ingredient.name FROM `productIngredient` 
-				INNER JOIN ingredient ON (ingredient.id=`productIngredient`.`ingredient-id` 
-				    AND ingredient.`language-code`=? 
+        $sql = "SELECT ingredient.id, ingredient.name FROM `productIngredient` 
+                INNER JOIN ingredient ON (ingredient.id=`productIngredient`.`ingredient-id` 
+                    AND ingredient.`language-code`=? 
                     AND `productIngredient`.`product-id`=?) 
                 ORDER BY `productIngredient`.`position`";
-		
+        
         return $this->query($sql, function($stmt) use($productId, $language) {
             $stmt->bind_param('si', $language, $productId);
             $stmt->execute();
@@ -100,7 +100,7 @@ class ProductRepository extends RepositoryBase {
             
             return $result;
         });
-	}
+    }
     
     private function buildProductByRow($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription) {
         $product = new Product();
@@ -115,32 +115,32 @@ class ProductRepository extends RepositoryBase {
     }
 }
 
-class BasketRepository extends RepositoryBase {		
+class BasketRepository extends RepositoryBase {        
     public function insertHeader($basket) {
         $sql = "INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) 
                 VALUES (?,?,?,?,?,?,?);
                 SELECT LAST_INSERT_ID();";
         
-		return $this->query($sql, function($stmt) use($basket) {
+        return $this->query($sql, function($stmt) use($basket) {
             $stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
             $stmt->execute();
             
             return $this->fetchScalar($stmt);
         });
-	}
+    }
     
     public function insertLine($headerId, $productId, $amount) {
         $sql = "INSERT INTO `basketLine`(`headerId`, `productId`, `productPrice`, `amount`) 
                 VALUES (?,?,SELECT price FROM product WHERE product.id = productId,?);
                 SELECT LAST_INSERT_ID();";
                 
-		return $this->query($sql, function($stmt, $con) use($headerId, $productId, $amount) {
+        return $this->query($sql, function($stmt, $con) use($headerId, $productId, $amount) {
             $stmt->bind_param('iid', $headerId, $productId, $amount);
             $stmt->execute();
             
             return $con->insert_id;
         });
-	}
+    }
 }
 
 class UserRepository extends RepositoryBase {
@@ -154,9 +154,9 @@ class UserRepository extends RepositoryBase {
             
             return $con->insert_id;
         });
-	}
+    }
     
-	public function getByEmail($email) {
+    public function getByEmail($email) {
         $sql = "SELECT `id`, `email`, `role`, `password`, `salt`, `givenname`, `surname`, `street`, `postCode`, `city` FROM `user` 
                 WHERE `email` = ?";
             
@@ -180,10 +180,10 @@ class UserRepository extends RepositoryBase {
                 $result->salt = $row_salt;
             }
         
-            return $result;	
+            return $result;
         });    
     }
-	
+    
     public function existsByEmail($email) {
         $sql = "SELECT COUNT(*) FROM `user` 
                 WHERE `email` = ?";
@@ -194,7 +194,7 @@ class UserRepository extends RepositoryBase {
             
             return $this->fetchScalar($stmt) > 0;
         });
-	}
+    }
 }
 
 class LanguageRepository extends RepositoryBase {

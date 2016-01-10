@@ -8,47 +8,47 @@ session_start();
 register_shutdown_function("setFatalErrorResponse");
 
 class ControllerFactory {
-	private $controllers = array();
-	
-	function __construct() {
+    private $controllers = array();
+    
+    function __construct() {
         $productRepo = new ProductRepository();
-		$this->registerController(new ProductController($productRepo));
-		$this->registerController(new UserController(new UserRepository(), new LanguageRepository()));
-		$this->registerController(new BasketController(new BasketRepository(), $productRepo));
-	}
-	
-	public function resolveController() {
+        $this->registerController(new ProductController($productRepo));
+        $this->registerController(new UserController(new UserRepository(), new LanguageRepository()));
+        $this->registerController(new BasketController(new BasketRepository(), $productRepo));
+    }
+    
+    public function resolveController() {
         $normalizedControllerName = strtolower(getStringFromUrl("controller"));
-		return $this->controllers[$normalizedControllerName];
-	}
-	
-	private function registerController($controller) {
+        return $this->controllers[$normalizedControllerName];
+    }
+    
+    private function registerController($controller) {
         $normalizedControllerName = strtolower($controller->name());
-		$this->controllers[$normalizedControllerName] = $controller;
-	}
+        $this->controllers[$normalizedControllerName] = $controller;
+    }
 }
 
 class ControllerBase {
-	private $actions = array();
-	private $controllerName;
-	
-	function __construct($controllerName) {
-		$this->controllerName = $controllerName;
-	}
-	
-	public function name() {
-		return $this->controllerName;
-	}
-	
-	public function invokeAction() {
+    private $actions = array();
+    private $controllerName;
+    
+    function __construct($controllerName) {
+        $this->controllerName = $controllerName;
+    }
+    
+    public function name() {
+        return $this->controllerName;
+    }
+    
+    public function invokeAction() {
         $normalizedActionName = strtolower(getStringFromUrl("action"));
         $this->actions[$normalizedActionName]();
-	}
-	
-	protected function registerAction($actionName, $action) {
+    }
+    
+    protected function registerAction($actionName, $action) {
         $normalizedActionName = strtolower($actionName);
-		$this->actions[$normalizedActionName] = $action;
-	}
+        $this->actions[$normalizedActionName] = $action;
+    }
     
     protected function verifyAuthenticated() {
         if (User::isAuthenticated() === false) {
@@ -58,24 +58,24 @@ class ControllerBase {
 }
 
 class ProductController extends ControllerBase {
-	private $productRepository;
-	
-	function __construct($productRepository) {
-		parent::__construct("product");
-		$this->productRepository = $productRepository;
-		$this->registerAction("getAll", function() { $this->getAll(); });
-		$this->registerAction("get", function() { $this->get(); });
-	}
-	
-	public function getAll() {
-		$products = $this->productRepository->getAll(getLangFromCookie());
-		setJsonResponse($products);
-	}
-	
-	public function get() {
+    private $productRepository;
+    
+    function __construct($productRepository) {
+        parent::__construct("product");
+        $this->productRepository = $productRepository;
+        $this->registerAction("getAll", function() { $this->getAll(); });
+        $this->registerAction("get", function() { $this->get(); });
+    }
+    
+    public function getAll() {
+        $products = $this->productRepository->getAll(getLangFromCookie());
+        setJsonResponse($products);
+    }
+    
+    public function get() {
         $productId = intval(getStringFromUrl("productId"));
         $currentLang = getLangFromCookie();
-		
+        
         $product = $this->productRepository->getById($productId, $currentLang);
         if ($product === null) {
             setNotFoundResponse();
@@ -84,51 +84,51 @@ class ProductController extends ControllerBase {
             $product->ingredients = $this->productRepository->getIngredients($productId, $currentLang);
             setJsonResponse($product);
         }
-	}
+    }
 }
 
-class BasketController extends ControllerBase {	
-	private $basketRepository;
-	private $productRepository;
+class BasketController extends ControllerBase {    
+    private $basketRepository;
+    private $productRepository;
     
-	function __construct($basketRepository, $productRepository) {
+    function __construct($basketRepository, $productRepository) {
         parent::__construct("basket");
         $this->basketRepository = $basketRepository;
-		$this->productRepository = $productRepository;	
-        $this->registerAction("getBasket", function() { $this->getBasket(); });			
+        $this->productRepository = $productRepository;    
+        $this->registerAction("getBasket", function() { $this->getBasket(); });            
         $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
         $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
-		$this->registerAction("completeOrder", function() { $this->completeOrder(); });
-	
-    }
-	
-	public function getBasket() {
-		setJsonResponse(User::current()->getBasket());
-	}
+        $this->registerAction("completeOrder", function() { $this->completeOrder(); });
     
-	public function addLineToBasket() {
+    }
+    
+    public function getBasket() {
+        setJsonResponse(User::current()->getBasket());
+    }
+    
+    public function addLineToBasket() {
         $this->verifyAuthenticated();
         $request = getJsonInput();
         
-		$basket = User::current()->getBasket();
+        $basket = User::current()->getBasket();
         $basket->addLine($request["productId"], $request["amount"], getLangFromCookie(), $this->productRepository);
-	}
-	
-	public function removeLinefromBasket() {
+    }
+    
+    public function removeLinefromBasket() {
         $this->verifyAuthenticated();
         $request = getJsonInput();
         
         $basket = User::current()->getBasket();
         $basket->removeLine($request["productId"]);
-	}
-	
-	public function completeOrder() {
-	}
+    }
+    
+    public function completeOrder() {
+    }
 }
 
 class UserController extends ControllerBase {
-	private $userRepository;
-	private $languageRepository;
+    private $userRepository;
+    private $languageRepository;
     
     function __construct($userRepository, $languageRepository) {
         parent::__construct("user");
@@ -159,7 +159,7 @@ class UserController extends ControllerBase {
         setJsonResponse($userExists);
     }
     
-    public function login()	{
+    public function login() {
         $credentials = getJsonInput();
         $success = User::login($this->userRepository, $credentials["email"], $credentials["password"]);
         setJsonResponse($success);
@@ -176,9 +176,9 @@ class UserController extends ControllerBase {
     }
         
     public function languages() {
-		$result = $this->languageRepository->getAll();
-		setJsonResponse($result);
-	}
+        $result = $this->languageRepository->getAll();
+        setJsonResponse($result);
+    }
 }
 
 $controllerFactory = new ControllerFactory();

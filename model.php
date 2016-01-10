@@ -8,13 +8,13 @@ class Product extends EntityBase {
     public $name;
     public $price;
     public $imgSmallPath;
-	public $description;
+    public $description;
     public $shortDescription;
-	public $ingredients;
+    public $ingredients;
 }
 
 class Ingredient extends EntityBase {
-	public $name;	
+    public $name;	
 }
 
 class Basket extends EntityBase {
@@ -30,28 +30,28 @@ class Basket extends EntityBase {
         }
     }
     
-	public $userId;
-	public $deliveryStreet;
-	public $deliveryPostCode;
-	public $deliveryCity;
-	public $invoiceStreet;
-	public $invoicePostCode;
-	public $invoiceCity;
-	public $lines = array();
+    public $userId;
+    public $deliveryStreet;
+    public $deliveryPostCode;
+    public $deliveryCity;
+    public $invoiceStreet;
+    public $invoicePostCode;
+    public $invoiceCity;
+    public $lines = array();
     
     public function addLine($productId, $amount, $language, $productRepository) {
         $found = false;
-		foreach ($this->lines as $line) {
-			if($line->productId === $productId) {
-				$found = true;
-				$line->amount += $amount;
-			}
-		}
-		
-		if($found === false) {
-			$product = $productRepository->getById($productId, $language);
-			$this->lines[] = new BasketLine($product, $amount);
-		}
+        foreach ($this->lines as $line) {
+            if($line->productId === $productId) {
+                $found = true;
+                $line->amount += $amount;
+            }
+        }
+
+        if($found === false) {
+            $product = $productRepository->getById($productId, $language);
+            $this->lines[] = new BasketLine($product, $amount);
+        }
     }
     
     public function removeLine($productId) {
@@ -162,8 +162,8 @@ class User extends EntityBase {
 }
 
 class Language {
-	public $code;
-	public $name;
+    public $code;
+    public $name;
 }
 
 ?>
