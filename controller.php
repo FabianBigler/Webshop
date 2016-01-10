@@ -5,22 +5,26 @@ require_once "helper.php";
 require_once "repository.php";
 
 session_start();
+register_shutdown_function("setFatalErrorResponse");
 
 class ControllerFactory {
 	private $controllers = array();
 	
 	function __construct() {
-		$this->registerController(new ProductController(new ProductRepository()));
+        $productRepo = new ProductRepository();
+		$this->registerController(new ProductController($productRepo));
 		$this->registerController(new UserController(new UserRepository(), new LanguageRepository()));
-		$this->registerController(new BasketController(new BasketRepository(), new ProductRepository()));
+		$this->registerController(new BasketController(new BasketRepository(), $productRepo));
 	}
 	
-	public function resolveController($controllerName) {
-		return $this->controllers[$controllerName];
+	public function resolveController() {
+        $normalizedControllerName = strtolower(getStringFromUrl("controller"));
+		return $this->controllers[$normalizedControllerName];
 	}
 	
 	private function registerController($controller) {
-		$this->controllers[$controller->name()] = $controller;
+        $normalizedControllerName = strtolower($controller->name());
+		$this->controllers[$normalizedControllerName] = $controller;
 	}
 }
 
@@ -36,27 +40,20 @@ class ControllerBase {
 		return $this->controllerName;
 	}
 	
-	public function invokeAction($actionName) {
-		$this->actions[$actionName]();
+	public function invokeAction() {
+        $normalizedActionName = strtolower(getStringFromUrl("action"));
+        $this->actions[$normalizedActionName]();
 	}
 	
 	protected function registerAction($actionName, $action) {
-		$this->actions[$actionName] = $action;
+        $normalizedActionName = strtolower($actionName);
+		$this->actions[$normalizedActionName] = $action;
 	}
     
     protected function verifyAuthenticated() {
         if (User::isAuthenticated() === false) {
-            throw new Exception("Not authorized");
+            setForbiddenResponse();
         }
-    }
-	
-	protected function renderJsonResult($result) {
-		header('Content-Type: application/json');
-		echo json_encode($result);
-	}
-    
-    protected function getJsonInput() {
-        return json_decode(file_get_contents('php://input'), true);
     }
 }
 
@@ -70,15 +67,62 @@ class ProductController extends ControllerBase {
 		$this->registerAction("get", function() { $this->get(); });
 	}
 	
-	public function getAll() {		
-		$result = $this->productRepository->GetAll(WebshopContext::GetLanguage());
-		$this->renderJsonResult($result);
+	public function getAll() {
+		$products = $this->productRepository->getAll(getLangFromCookie());
+		setJsonResponse($products);
 	}
 	
 	public function get() {
-		$productId = htmlspecialchars($_GET["productId"]);
-		$result = $this->productRepository->getProductWithIngredients(WebshopContext::getLanguage(), $productId);
-		$this->renderJsonResult($result);
+        $productId = intval(getStringFromUrl("productId"));
+        $currentLang = getLangFromCookie();
+		
+        $product = $this->productRepository->getById($productId, $currentLang);
+        if ($product === null) {
+            setNotFoundResponse();
+        }
+        else {
+            $product->ingredients = $this->productRepository->getIngredients($productId, $currentLang);
+            setJsonResponse($product);
+        }
+	}
+}
+
+class BasketController extends ControllerBase {	
+	private $basketRepository;
+	private $productRepository;
+    
+	function __construct($basketRepository, $productRepository) {
+        parent::__construct("basket");
+        $this->basketRepository = $basketRepository;
+		$this->productRepository = $productRepository;	
+        $this->registerAction("getBasket", function() { $this->getBasket(); });			
+        $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
+        $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
+		$this->registerAction("completeOrder", function() { $this->completeOrder(); });
+	
+    }
+	
+	public function getBasket() {
+		setJsonResponse(User::current()->getBasket());
+	}
+    
+	public function addLineToBasket() {
+        $this->verifyAuthenticated();
+        $request = getJsonInput();
+        
+		$basket = User::current()->getBasket();
+        $basket->addLine($request["productId"], $request["amount"], getLangFromCookie(), $this->productRepository);
+	}
+	
+	public function removeLinefromBasket() {
+        $this->verifyAuthenticated();
+        $request = getJsonInput();
+        
+        $basket = User::current()->getBasket();
+        $basket->removeLine($request["productId"]);
+	}
+	
+	public function completeOrder() {
 	}
 }
 
@@ -94,135 +138,50 @@ class UserController extends ControllerBase {
         $this->registerAction("existsUser", function() { $this->existsUser(); });
         $this->registerAction("login", function() { $this->login(); });
         $this->registerAction("logout", function() { $this->logout(); });
-        $this->registerAction("getCurrentUser", function() { $this->getCurrentUser(); });
+        $this->registerAction("getCurrent", function() { $this->getCurrent(); });
         $this->registerAction("languages", function() { $this->languages(); });
     }
 
     public function register() {
         $user = new User();
-        $user->applyValuesFromArray($this->getJsonInput());
-        if ($this->userRepository->existsUserByEmail($user->email)) {
-            throw new Exception('User already exists.');
-        }
+        $user->applyValuesFromArray(getJsonInput());
         
-        $this->userRepository->addUser($user);
+        if ($this->userRepository->existsByEmail($user->email)) {
+            setErrorResponse('User already exists.');
+        }
+        else {
+            $this->userRepository->insert($user);
+        }
     }
     
     public function existsUser() {
-        $userExists = $this->userRepository->existsUserByEmail($_GET["email"]);
-        
-        $this->renderJsonResult($userExists);
+        $userExists = $this->userRepository->existsByEmail(getStringFromUrl("email"));
+        setJsonResponse($userExists);
     }
     
     public function login()	{
-        $request = $this->getJsonInput();
-        $success = User::login($this->userRepository, $request["email"], $request["password"]);
-        
-        $this->renderJsonResult($success);
+        $credentials = getJsonInput();
+        $success = User::login($this->userRepository, $credentials["email"], $credentials["password"]);
+        setJsonResponse($success);
     }
     
     public function logout() {
+        $this->verifyAuthenticated();
         User::logout();
     }
     
-    public function getCurrentUser() {
-        $this->renderJsonResult(User::current());
+    public function getCurrent() {
+        $this->verifyAuthenticated();
+        setJsonResponse(User::current());
     }
         
     public function languages() {
 		$result = $this->languageRepository->getAll();
-		$this->renderJsonResult($result);
-	}
-}
-
-class BasketController extends ControllerBase {	
-	private $basketRepository;
-	private $productRepository;
-    
-	function __construct($basketRepository, $productRepository) {
-        parent::__construct("basket");
-        $this->basketRepository = $basketRepository;
-		$this->productRepository = $productRepository;		
-        $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
-        $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
-		$this->registerAction("completeOrder", function() { $this->completeOrder(); });
-		$this->registerAction("getBasket", function() { $this->getBasket(); });			
-    }
-	
-	public function addLineToBasket() {
-        $this->verifyAuthenticated();
-        
-		$basket = $this->basket();
-		$request = $this->getJsonInput();		
-		$found = false;
-		foreach ($basket->lines as $line) {
-			if($line->productId == $request["productId"])
-			{
-				$found = true;
-				$line->amount += $request["amount"];
-			}
-		}
-		
-		if(!$found) {
-			$product = $this->productRepository->getProduct(WebshopContext::GetLanguage(), $request["productId"]);
-			$basketLine = new BasketLine();
-			$basketLine->productId = $request["productId"];
-			$basketLine->amount = $request["amount"];
-			$basketLine->productPrice = $product->price;		
-			$basketLine->productName = $product->name;
-			$basket->lines[] = $basketLine;
-		}
-	}
-	
-	public function removeLinefromBasket() {
-        $this->verifyAuthenticated();
-        $request = $this->getJsonInput();		
-		$basket = $this->basket();
-		
-		$index = 0;
-		$foundIndex = null;
-		foreach ($basket->lines as $line) {			
-			if($line->productId == $request["productId"])
-			{
-				$foundIndex = $index;								
-			}
-			$index++;
-		}
-		
-		if(isset($foundIndex)) {
-			unset($basket->lines[$foundIndex]);	
-			$basket->lines = array_values($basket->lines);
-		}				
-	}
-	
-	public function completeOrder() {
-        $this->verifyAuthenticated();
-        
-		$basket = $this->basket();
-		if(count($basket->lines) == 0)
-		{
-			throw new Exception("Basket is empty");
-		}						
-		
-		//persist basket, unset session basket
-		$this->basketRepository->completeOrder($basket);
-		$_SESSION["basket"] = null;
-	}
-	
-	public function basket() {
-		if (!isset($_SESSION["basket"])) {
-			$_SESSION["basket"] = new Basket(User::current());;			
-		}	
-        
-		return $_SESSION["basket"];		
-	}
-	
-	public function getBasket() {
-		$this->renderJsonResult($this->basket());
+		setJsonResponse($result);
 	}
 }
 
 $controllerFactory = new ControllerFactory();
-$controllerFactory->resolveController($_GET["controller"])->invokeAction($_GET["action"]);
+$controllerFactory->resolveController()->invokeAction();
 
 ?>

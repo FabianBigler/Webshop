@@ -111,7 +111,7 @@ var maribelle;
         
         function getCurrentUser() {
             return $http({
-                url: rootUrl + '/controller.php?controller=user&action=getCurrentUser',
+                url: rootUrl + '/controller.php?controller=user&action=getCurrent',
                 method: 'GET',
                 params: null,
             })

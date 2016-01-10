@@ -20,7 +20,7 @@ class Ingredient extends EntityBase {
 class Basket extends EntityBase {
     function __construct($user) {
         if (isset($user)) {
-            $this->userId = $user->userId;
+            $this->userId = $user->id;
             $this->deliveryStreet = $user->street;
             $this->deliveryPostCode = $user->postCode;
             $this->deliveryCity = $user->city;
@@ -37,11 +37,42 @@ class Basket extends EntityBase {
 	public $invoiceStreet;
 	public $invoicePostCode;
 	public $invoiceCity;
-
 	public $lines = array();
+    
+    public function addLine($productId, $amount, $language, $productRepository) {
+        $found = false;
+		foreach ($this->lines as $line) {
+			if($line->productId === $productId) {
+				$found = true;
+				$line->amount += $amount;
+			}
+		}
+		
+		if($found === false) {
+			$product = $productRepository->getById($productId, $language);
+			$this->lines[] = new BasketLine($product, $amount);
+		}
+    }
+    
+    public function removeLine($productId) {
+        $condition = function($line) use ($productId) { 
+            return $line->productId !== $productId; 
+        };
+        
+        $this->lines = array_values(array_filter($this->lines, $condition));
+    }
 }
 
 class BasketLine extends EntityBase {
+    function __construct($product, $amount) {
+        if (isset($product) && isset($amount)) {
+            $this->productId = $product->id;
+			$this->productPrice = $product->price;		
+			$this->productName = $product->name;
+            $this->amount = $amount;
+        }
+    }
+    
 	public $productId;
 	public $productName;
 	public $productPrice;
@@ -64,7 +95,16 @@ class User extends EntityBase {
 	public $role;
 	public $password;
 	public $salt;
+    public $basket;
 	
+    public function getBasket() {
+        if ($this->basket === null) {
+            $this->basket = new Basket($this);
+        }
+        
+        return $this->basket;
+    }
+    
     public static function current() {
         if (isset($_SESSION["currentUser"])) {
             return $_SESSION["currentUser"];
@@ -79,7 +119,7 @@ class User extends EntityBase {
     }
     
     public static function login($userRepository, $email, $password) {
-        $user = $userRepository->getUserByEmail($email);	
+        $user = $userRepository->getByEmail($email);	
         
         if (isset($user) && $user->isPasswordValid($password)) {	
             unset($user->salt);

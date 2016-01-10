@@ -42,7 +42,6 @@
                 data: { productId: id, amount: amount }
             });
         }
-	
     }
 
     product.detailRoute = {

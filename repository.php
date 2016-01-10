@@ -4,272 +4,219 @@ require_once "helper.php";
 require_once "model.php";
 
 class RepositoryBase {
-	protected $conn;
-	protected function initConnection()	{
-		$db = new Database();
-		$this->conn = $db->getConnection();
-		if ($this->conn->connect_error) {
-			die("Connection failed: " . $this->conn->connect_error);
-		} 				
-	}
-}
-
-class BasketRepository extends RepositoryBase {		
-	public function TEST() {
-		return 0;
-	}
-
-	public function completeOrder($basket) {
-		if(count($basket->lines) == 0) {
-			throw new Exception("Basket is empty");
-		}			
-		
-		$this->initConnection();			
-		$sql = 'INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) VALUES (?,?,?,?,?,?,?)';	
-		$stmt = $this->conn->prepare($sql) or die($this->conn->error);      		
-		$stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
-		$stmt->execute();
-
-		//how to get new id?
-		
-		foreach($basket.lines as $line)
-		{
-			addLine($basket.id, $line.productId, $amount);
-		}
-		
-		//foreach lines!!
-	}
-	
-	public function addLine($headerId, $productId, $amount)
-	{
-		$this->initConnection();
-		$sql = "INSERT INTO `basketLine`(`headerId`, `productId`, `productPrice`, `amount`) 
-				VALUES (?,?,SELECT price FROM product WHERE product.id = productId,?)";						
-		$stmt = $this->conn->prepare($sql);		
-		$stmt->bind_param('iid', $headerId, $productId, $amount);
-		
-		if($stmt === false) {
-		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
-		}		
-		$stmt->execute();
-	}
-	
-	/*
-	public function getOrCreate($userId)
-	{
-		$this->initConnection();
-		if($this->get($userId) == null)
-		{
-			//create a new basket!
-			
-		} else {
-			
-		}
-		//INSERT INTO `basketHeader`(`id`, `userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) 
-		//VALUES ([value-1],[value-2],[value-3],[value-4],[value-5],[value-6],[value-7],[value-8])
-	}
-	
-	
-
-	
-	//not fully functional!
-	private function get($userId)
-	{	
-		$this->initConnection();
-		$sql = "SELECT `id`, `userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, 
-				`invoicePostCode`, `invoiceCity` WHERE userID = ?";
-		$stmt = $this->conn->prepare($sql);
-		$stmt->bind_param('i', $userId);
-		if($stmt === false)
-		{
-			trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
-		}
-				$stmt->execute();		
-		$stmt->bind_result(	$row_id, 
-							$row_userid, 
-							$row_deliveryStreet, 
-							$row_deliveryPostCode, 
-							$row_deliveryCity, 
-							$row_invoiceStreet, 
-							$row_invoicePostCode, 
-							$row_invoiceCity);
-		
-		if($stmt->fetch())
-		{
-			$basket = new Basket(null);
-			$basket->id = $row_id;
-			$basket->userId = $row_userid;
-			$basket->deliveryStreet = $row_deliveryStreet;
-			$basket->deliveryPostCode = $row_deliveryPostCode;
-			$basket->deliveryCity = $row_deliveryCity;
-			$basket->invoiceStreet = $row_invoiceStreet;
-			$basket->invoicePostCode = $row_invoicePostCode;
-			$basket->invoiceCity = $row_invoiceCity;	
-			return $basket;
-		}
-		return null;	
-	}
-	*/
-}
-
-class UserRepository extends RepositoryBase {
-	public function getUserByEmail($email) {
-		$this->initConnection();
-		$sql = "SELECT `id`, `email`, `role`, `password`, `salt`, `givenname`, `surname`, `street`, `postCode`, `city` FROM `user` WHERE `email`=?";		
-		$stmt = $this->conn->prepare($sql);		
-		$stmt->bind_param('s', $email);		
-		if($stmt === false) {
-		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
-		}
-		
-		$stmt->execute();		
-		$stmt->bind_result($row_id, $row_email, $row_role, $row_pw, $row_salt, $row_givenname, $row_surname, $row_street, $row_postCode, $row_city);
-		
-		if($stmt->fetch())
-		{
-			$user = new User();
-			$user->id = $row_id;
-			$user->email = $row_email;
-			$user->givenname = $row_givenname;
-			$user->surname = $row_surname;
-			$user->street = $row_street;
-			$user->postCode = $row_postCode;
-			$user->city = $row_city;
-			$user->role = $row_role;
-			$user->password = $row_pw;
-			$user->salt = $row_salt;	
-			return $user;
-		}
-		return null;		
-	}
-	
-    public function existsUserByEmail($email) {
-        // TODO: Implement query correctly
-        return $this->getUserByEmail($email) !== null;
+    protected function query($sql, $action) {
+        $con = getDbConnection();
+        $stmt = $con->prepare($sql) or die($con->error);
+        
+        $result;
+        $ex;
+        try {
+            $result = $action($stmt, $con);
+            
+            if ($stmt->error !== null && $stmt->error !== "") {
+                throw new Exception($stmt->error);
+            }
+        }
+        catch (Exception $e) {
+            $ex = $e;
+        }
+        
+        $stmt->close();
+        $con->close();
+        
+        // try,finally
+        if (isset($ex)) {
+            throw $ex;
+        }
+    
+        return $result;
     }
     
-	public function addUser($user) {
-		$this->initConnection();
-		$sql = "INSERT INTO `user` (`email`, `role`, `password`, `salt`, `givenname`, `surname`,  `street`, `postCode`, `city`) VALUES (?,?,?,?,?,?,?,?,?)";
-		$stmt = $this->conn->prepare($sql) or die($this->conn->error);      		
-		$stmt->bind_param('sisssssss', $user->email, $user->role, $user->password, $user->salt, $user->givenname, $user->surname, $user->street, $user->postCode, $user->city);
-		$stmt->execute();				
-	}
-}
-
-class LanguageRepository extends RepositoryBase {
-    public function getAll() {
-        $this->initConnection();
+    protected function fetchScalar($stmt) {
+        $stmt->bind_result($value);
+        $stmt->fetch();
         
-		$stmt = $this->conn->prepare("SELECT `code`, `name` FROM `language`");		
-		$stmt->execute();		
-		$stmt->bind_result($row_code, $row_name);
-		
-        $result = array();
-		while ($stmt->fetch()) {
-			$lang = new Language();
-			$lang->code = utf8_encode($row_code);
-			$lang->name = utf8_encode($row_name);
-            
-            $result[] = $lang;
-		}
-        
-		return $result;	
+        return $value;
     }
 }
 
 class ProductRepository extends RepositoryBase {		
 	public function getAll($language) {
-		return $this->getProducts($language);
+		$sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
+                INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `language-code`=?)";
+		
+        return $this->query($sql, function($stmt) use($language) {
+            $stmt->bind_param('s', $language);
+            $stmt->execute();
+            
+            $stmt->bind_result($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription);
+            $result = array();
+            while ($stmt->fetch()) {
+                $result[] = $this->buildProductByRow($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription);
+            }
+            
+            return $result;
+        });
+	}
+    
+    public function getById($productId, $language) {
+		$sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
+                INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `product`.`id`=? AND `language-code`=?)";
+		
+        return $this->query($sql, function($stmt) use($productId, $language) {
+            $stmt->bind_param('is', $productId, $language);
+            $stmt->execute();
+            
+            $stmt->bind_result($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription);
+            $result = null;
+            if ($stmt->fetch()) {
+                $result = $this->buildProductByRow($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription);
+            }
+            
+            return $result;
+        });
 	}
 	
-	public function getProductWithIngredients($language, $id) {		
-		$products = $this->getProducts($language, $id);
-		if(count($products) == 1)
-		{
-			$product = $products[0];
-			$product->ingredients = $this->getIngredients($language, $id);		
-			return $product;
-		}
-		return null;
-	}	
-	
-	public function getProduct($language, $id) {
-		$products = $this->getProducts($language, $id);
-		$product = $products[0];
-		if(count($products) == 1)
-		{
-			$product = $products[0];
-			return $product;
-		}
-	}
-	
-	private function getProducts($language, $id = NULL) {		
-		$this->initConnection();
-		$sql = "SELECT product.id, name, price, imgSmallPath, description, 
-		`short-description` FROM `product` INNER JOIN `productText` 
-        ON (product.id=`productText`.`product-id` 
-		AND `language-code`=?";
-		
-		if(isset($id)) {
-			$sql = $sql . ' AND `product`.`id`=?)';
-		} 
-        else {
-			$sql = $sql . ')';
-		}
-        
-		$stmt = $this->conn->prepare($sql);		
-		
-		if(isset($id)) {
-			$stmt->bind_param('ss', htmlspecialchars($language), intval($id));
-		} 
-        else {
-			$stmt->bind_param('s', htmlspecialchars($language));
-		}
-		
-		if($stmt === false) {
-		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
-		}
-		
-		$stmt->execute();		
-		$stmt->bind_result($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription);
-		while($stmt->fetch()) {
-            $product = new Product();
-            $product->id = $row_id;
-            $product->name = utf8_encode($row_name);
-            $product->price = $row_price;
-            $product->imgSmallPath = $row_img;
-            $product->description = utf8_encode($row_description);
-            $product->shortDescription = utf8_encode($row_shortDescription);
-            $products[] = $product;
-		}
-        
-		return $products;
-	}
-	
-	private function getIngredients($language, $productId) {
-		$this->initConnection();		
+    public function getIngredients($productId, $language) {
 		$sql = "SELECT ingredient.id, ingredient.name FROM `productIngredient` 
 				INNER JOIN ingredient ON (ingredient.id=`productIngredient`.`ingredient-id` 
-				AND ingredient.`language-code`=? AND `productIngredient`.`product-id`=?) ORDER BY `productIngredient`.`position`";
+				    AND ingredient.`language-code`=? 
+                    AND `productIngredient`.`product-id`=?) 
+                ORDER BY `productIngredient`.`position`";
 		
-        $stmt = $this->conn->prepare($sql);
-		if($stmt === false) {
-		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $conn->errno . ' ' . $conn->error, E_USER_ERROR);
-		}
-        
-		$stmt->bind_param('si', htmlspecialchars($language), intval($productId));
-		$stmt->execute();		
-		$stmt->bind_result($row_id, $row_name);
-		while($stmt->fetch()) {
-			$ingredient = new Ingredient();
-			$ingredient->id = $row_id;
-			$ingredient->name = utf8_encode($row_name);
-			$ingredients[] = $ingredient;
-		}	
-        
-		return $ingredients;		
+        return $this->query($sql, function($stmt) use($productId, $language) {
+            $stmt->bind_param('si', $language, $productId);
+            $stmt->execute();
+            
+            $stmt->bind_result($row_id, $row_name);
+            $result = array();
+            while ($stmt->fetch()) {
+                $ingredient = new Ingredient();
+                $ingredient->id = intval($row_id);
+                $ingredient->name = utf8_encode($row_name);
+                
+                $result[] = $ingredient;
+            }
+            
+            return $result;
+        });
 	}
+    
+    private function buildProductByRow($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription) {
+        $product = new Product();
+        $product->id = intval($row_id);
+        $product->name = utf8_encode($row_name);
+        $product->price = floatval($row_price);
+        $product->imgSmallPath = utf8_encode($row_img);
+        $product->description = utf8_encode($row_description);
+        $product->shortDescription = utf8_encode($row_shortDescription);
+        
+        return $product;
+    }
+}
+
+class BasketRepository extends RepositoryBase {		
+    public function insertHeader($basket) {
+        $sql = "INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) 
+                VALUES (?,?,?,?,?,?,?);
+                SELECT LAST_INSERT_ID();";
+        
+		return $this->query($sql, function($stmt) use($basket) {
+            $stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
+            $stmt->execute();
+            
+            return $this->fetchScalar($stmt);
+        });
+	}
+    
+    public function insertLine($headerId, $productId, $amount) {
+        $sql = "INSERT INTO `basketLine`(`headerId`, `productId`, `productPrice`, `amount`) 
+                VALUES (?,?,SELECT price FROM product WHERE product.id = productId,?);
+                SELECT LAST_INSERT_ID();";
+                
+		return $this->query($sql, function($stmt, $con) use($headerId, $productId, $amount) {
+            $stmt->bind_param('iid', $headerId, $productId, $amount);
+            $stmt->execute();
+            
+            return $con->insert_id;
+        });
+	}
+}
+
+class UserRepository extends RepositoryBase {
+    public function insert($user) {
+        $sql = "INSERT INTO `user` (`email`, `role`, `password`, `salt`, `givenname`, `surname`,  `street`, `postCode`, `city`) 
+                VALUES (?,?,?,?,?,?,?,?,?)";
+        
+        return $this->query($sql, function($stmt, $con) use($user) {
+            $stmt->bind_param('sisssssss', $user->email, $user->role, $user->password, $user->salt, $user->givenname, $user->surname, $user->street, $user->postCode, $user->city);
+            $stmt->execute();
+            
+            return $con->insert_id;
+        });
+	}
+    
+	public function getByEmail($email) {
+        $sql = "SELECT `id`, `email`, `role`, `password`, `salt`, `givenname`, `surname`, `street`, `postCode`, `city` FROM `user` 
+                WHERE `email` = ?";
+            
+        return $this->query($sql, function($stmt) use($email) {
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            
+            $stmt->bind_result($row_id, $row_email, $row_role, $row_pw, $row_salt, $row_givenname, $row_surname, $row_street, $row_postCode, $row_city);
+            $result = null;
+            if ($stmt->fetch()) {
+                $result = new User();
+                $result->id = $row_id;
+                $result->email = $row_email;
+                $result->givenname = $row_givenname;
+                $result->surname = $row_surname;
+                $result->street = $row_street;
+                $result->postCode = $row_postCode;
+                $result->city = $row_city;
+                $result->role = $row_role;
+                $result->password = $row_pw;
+                $result->salt = $row_salt;
+            }
+        
+            return $result;	
+        });    
+    }
+	
+    public function existsByEmail($email) {
+        $sql = "SELECT COUNT(*) FROM `user` 
+                WHERE `email` = ?";
+                
+        return $this->query($sql, function($stmt) use($email) {
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            
+            return $this->fetchScalar($stmt) > 0;
+        });
+	}
+}
+
+class LanguageRepository extends RepositoryBase {
+    public function getAll() {
+        $sql = "SELECT `code`, `name` FROM `language`";
+        
+        return $this->query($sql, function($stmt) {
+            $stmt->execute();
+            
+            $stmt->bind_result($row_code, $row_name);
+            $result = array();
+            while ($stmt->fetch()) {
+                $lang = new Language();
+                $lang->code = utf8_encode($row_code);
+                $lang->name = utf8_encode($row_name);
+                
+                $result[] = $lang;
+            }
+            
+            return $result;
+        });
+    }
 }
 
 ?>
