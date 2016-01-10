@@ -2,8 +2,9 @@
 
 (function (basket) {
 
-    function BasketViewModel($scope, $http, rootUrl) {
-        $scope.basket = {};                
+    function BasketViewModel($scope, $http, $state, rootUrl) {
+        $scope.basket = {};
+        $scope.status = {};            
 
         getBasket().then(function (basket) {
             $scope.basket = basket;
@@ -22,7 +23,11 @@
         };
         
         $scope.completeOrder = function() {
-            completeOrder();
+            completeOrder().then(function(basketId) {
+                // TODO: Redirect to completed basked, show confirmation there.
+                // $state.go(basket.basketRoute, { id: basketId }, { reload: true });
+                $scope.status = { type: 'success', messageKey: 'orderCompleted', show: true };
+            });
         }
         
         $scope.getTotal = function() {
@@ -56,13 +61,14 @@
             return $http({
                 url: rootUrl + '/controller.php?controller=basket&action=completeOrder',
                 method: 'POST',                
-            });
+            })
+            .then(maribelle.mapData);
         }
     }
 
     basket.basketRoute = {
         name: 'basket',
-        url: '/basket',
+        url: '/basket/:id',
         views: {
             '@': {
                 templateUrl: 'views/basket.html',

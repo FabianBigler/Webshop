@@ -1,4 +1,9 @@
 <h1>{{'basket' | translate }}</h1>
+<uib-alert close="status.show = false" type="{{status.type}}" 
+           ng-show="status.show === true">
+    {{ status.messageKey | translate }}
+</uib-alert>
+
 <div class="row">
     <div class="col-sm-6">
         <h3>{{'deliveryAddress' | translate}}</h3>

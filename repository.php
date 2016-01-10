@@ -118,24 +118,22 @@ class ProductRepository extends RepositoryBase {
 class BasketRepository extends RepositoryBase {        
     public function insertHeader($basket) {
         $sql = "INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) 
-                VALUES (?,?,?,?,?,?,?);
-                SELECT LAST_INSERT_ID();";
+                VALUES (?,?,?,?,?,?,?)";
         
-        return $this->query($sql, function($stmt) use($basket) {
+        return $this->query($sql, function($stmt, $con) use($basket) {
             $stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
             $stmt->execute();
             
-            return $this->fetchScalar($stmt);
+            return $con->insert_id;
         });
     }
     
-    public function insertLine($headerId, $productId, $amount) {
+    public function insertLine($headerId, $productId, $price, $amount) {
         $sql = "INSERT INTO `basketLine`(`headerId`, `productId`, `productPrice`, `amount`) 
-                VALUES (?,?,SELECT price FROM product WHERE product.id = productId,?);
-                SELECT LAST_INSERT_ID();";
+                VALUES (?,?,?,?)";
                 
-        return $this->query($sql, function($stmt, $con) use($headerId, $productId, $amount) {
-            $stmt->bind_param('iid', $headerId, $productId, $amount);
+        return $this->query($sql, function($stmt, $con) use($headerId, $productId, $price, $amount) {
+            $stmt->bind_param('iidd', $headerId, $productId, $price, $amount);
             $stmt->execute();
             
             return $con->insert_id;

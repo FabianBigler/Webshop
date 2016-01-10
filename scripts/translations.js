@@ -37,7 +37,8 @@
                 'completeOrder': 'Bestellung abschliessen',
                 'FR': 'Français',
                 'DE': 'Deutsch',
-                'EN': 'English'
+                'EN': 'English',
+                'orderCompleted': 'Die Bestellung wurde abgeschickt.'
             });
             
             $translateProvider.translations('EN', {
@@ -73,7 +74,8 @@
                 'completeOrder': 'Complete Order',
                 'FR': 'Français',
                 'DE': 'Deutsch',
-                'EN': 'English'
+                'EN': 'English',
+                'orderCompleted': 'The order has been sent.'
             });
 
             $translateProvider.translations('FR', {
@@ -109,7 +111,8 @@
                 'completeOrder': 'Terminer la commande',
                 'FR': 'Français',
                 'DE': 'Deutsch',
-                'EN': 'English'
+                'EN': 'English',
+                'orderCompleted': 'La commande a été envoyée.'
             });
 
             $translateProvider.preferredLanguage('de');

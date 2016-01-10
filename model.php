@@ -61,6 +61,14 @@ class Basket extends EntityBase {
         
         $this->lines = array_values(array_filter($this->lines, $condition));
     }
+    
+    public function completeOrder($basketRepository) {
+        $this->id = $basketRepository->insertHeader($this);
+        
+        foreach ($this->lines as $line) { 
+            $line->id = $basketRepository->insertLine($this->id, $line->productId, $line->productPrice, $line->amount);
+        }
+    }
 }
 
 class BasketLine extends EntityBase {

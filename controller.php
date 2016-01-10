@@ -122,6 +122,13 @@ class BasketController extends ControllerBase {
     }
     
     public function completeOrder() {
+        $this->verifyAuthenticated();
+        $basket = User::current()->getBasket();
+        $basket->completeOrder($this->basketRepository);
+    
+        User::current()->basket = null;
+        
+        setJsonResponse($basket->id);
     }
 }
 

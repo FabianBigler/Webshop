@@ -21,7 +21,7 @@
 
     product.overviewRoute = {
         name: 'overview',
-        url: '/home',
+        url: '/product/home',
         views: {
             '@': {
                 templateUrl: 'views/product-overview.html',

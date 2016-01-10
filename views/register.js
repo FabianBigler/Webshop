@@ -55,7 +55,7 @@
 
     user.registerRoute = {
         name: 'user-register',
-        url: '/user/register',
+        url: '/user/register/',
         views: {
             '@': {
                 templateUrl: 'views/register.html',
