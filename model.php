@@ -1,7 +1,7 @@
 <?php
 
 class EntityBase {
-	public $id;
+    public $id;
 }
 
 class Product extends EntityBase {
@@ -14,7 +14,7 @@ class Product extends EntityBase {
 }
 
 class Ingredient extends EntityBase {
-    public $name;	
+    public $name;
 }
 
 class Basket extends EntityBase {
@@ -26,7 +26,7 @@ class Basket extends EntityBase {
             $this->deliveryCity = $user->city;
             $this->invoiceStreet = $user->street;
             $this->invoicePostCode = $user->postCode;
-            $this->invoiceCity = $user->city;	
+            $this->invoiceCity = $user->city;
         }
     }
     
@@ -67,16 +67,16 @@ class BasketLine extends EntityBase {
     function __construct($product, $amount) {
         if (isset($product) && isset($amount)) {
             $this->productId = $product->id;
-			$this->productPrice = $product->price;		
-			$this->productName = $product->name;
+            $this->productPrice = $product->price;        
+            $this->productName = $product->name;
             $this->amount = $amount;
         }
     }
     
-	public $productId;
-	public $productName;
-	public $productPrice;
-	public $amount;
+    public $productId;
+    public $productName;
+    public $productPrice;
+    public $amount;
 }
 
 class User extends EntityBase {
@@ -86,17 +86,17 @@ class User extends EntityBase {
         $this->role = 2;
     }
     
-	public $givenname;
-	public $surname;
-	public $email;
-	public $street;
-	public $postCode;
-	public $city;
-	public $role;
-	public $password;
-	public $salt;
+    public $givenname;
+    public $surname;
+    public $email;
+    public $street;
+    public $postCode;
+    public $city;
+    public $role;
+    public $password;
+    public $salt;
     public $basket;
-	
+    
     public function getBasket() {
         if ($this->basket === null) {
             $this->basket = new Basket($this);
@@ -119,9 +119,9 @@ class User extends EntityBase {
     }
     
     public static function login($userRepository, $email, $password) {
-        $user = $userRepository->getByEmail($email);	
+        $user = $userRepository->getByEmail($email);
         
-        if (isset($user) && $user->isPasswordValid($password)) {	
+        if (isset($user) && $user->isPasswordValid($password)) {
             unset($user->salt);
             unset($user->password);
             $_SESSION["currentUser"] = $user;
@@ -137,28 +137,28 @@ class User extends EntityBase {
         $_SESSION["currentUser"] = null;
     }
     
-	public function setPassword($password) {
-		$this->salt = bin2hex(openssl_random_pseudo_bytes(8));
-		$this->password = $this->getHash($password);
-	}
+    public function setPassword($password) {
+        $this->salt = bin2hex(openssl_random_pseudo_bytes(8));
+        $this->password = $this->getHash($password);
+    }
     
     public function applyValuesFromArray($newValues) {
-        $this->givenname = $newValues["givenname"];			
-        $this->surname = $newValues["surname"];			
-        $this->email = $newValues["email"];			
+        $this->givenname = $newValues["givenname"];
+        $this->surname = $newValues["surname"];
+        $this->email = $newValues["email"];
         $this->street = $newValues["street"];
         $this->postCode = $newValues["postCode"];
         $this->city = $newValues["city"];
-        $this->setPassword($newValues["password"]);	
+        $this->setPassword($newValues["password"]);
     }
     
     private function isPasswordValid($password) {
         return $this->password === $this->getHash($password);
     }
-	
-	private function getHash($password) {
-		return hash("sha256", $password . $this->salt);
-	}
+    
+    private function getHash($password) {
+        return hash("sha256", $password . $this->salt);
+    }
 }
 
 class Language {

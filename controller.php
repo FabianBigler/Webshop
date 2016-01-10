@@ -99,7 +99,6 @@ class BasketController extends ControllerBase {
         $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
         $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
         $this->registerAction("completeOrder", function() { $this->completeOrder(); });
-    
     }
     
     public function getBasket() {
