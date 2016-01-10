@@ -10,8 +10,10 @@
         $scope.$watch(
             function() { return $scope.newUser.email; },
             debounce(function(email) {
-                existsUser(email)
-                    .then(function(exists) { $scope.emailAlreadyExists = exists; });
+                if (email) { 
+                    existsUser(email)
+                        .then(function(exists) { $scope.emailAlreadyExists = exists; });
+                }
             }, 1000)
         );
         
