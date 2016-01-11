@@ -158,7 +158,7 @@ class UserController extends ControllerBase {
     }
     
     public function existsUser($email) {
-        $userExists = $this->userRepository->existsByEmail();
+        $userExists = $this->userRepository->existsByEmail($email);
         setJsonResponse($userExists);
     }
     
