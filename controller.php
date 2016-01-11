@@ -64,7 +64,7 @@ class ProductController extends ControllerBase {
         parent::__construct("product");
         $this->productRepository = $productRepository;
         $this->registerAction("getAll", function() { $this->getAll(); });
-        $this->registerAction("get", function() { $this->get(); });
+        $this->registerAction("get", function() { $this->get(intval(getStringFromUrl("productId"))); });
     }
     
     public function getAll() {
@@ -72,16 +72,13 @@ class ProductController extends ControllerBase {
         setJsonResponse($products);
     }
     
-    public function get() {
-        $productId = intval(getStringFromUrl("productId"));
-        $currentLang = getLangFromCookie();
-        
-        $product = $this->productRepository->getById($productId, $currentLang);
+    public function get($productId) {
+        $product = $this->productRepository->getById($productId, getLangFromCookie());
         if ($product === null) {
             setNotFoundResponse();
         }
         else {
-            $product->ingredients = $this->productRepository->getIngredients($productId, $currentLang);
+            $product->ingredients = $this->productRepository->getIngredients($productId, getLangFromCookie());
             setJsonResponse($product);
         }
     }
@@ -96,26 +93,27 @@ class BasketController extends ControllerBase {
         $this->basketRepository = $basketRepository;
         $this->productRepository = $productRepository;    
         $this->registerAction("getBasket", function() { $this->getBasket(); });            
-        $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(); });
-        $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(); });
+        $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(getJsonInput()); });
+        $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(getJsonInput()); });
         $this->registerAction("completeOrder", function() { $this->completeOrder(); });
     }
     
     public function getBasket() {
-        setJsonResponse(User::current()->getBasket());
+        $this->verifyAuthenticated();
+        
+        $basket = User::current()->getBasket();
+        setJsonResponse($basket);
     }
     
-    public function addLineToBasket() {
+    public function addLineToBasket($request) {
         $this->verifyAuthenticated();
-        $request = getJsonInput();
         
         $basket = User::current()->getBasket();
         $basket->addLine($request["productId"], $request["amount"], getLangFromCookie(), $this->productRepository);
     }
     
-    public function removeLinefromBasket() {
+    public function removeLinefromBasket($request) {
         $this->verifyAuthenticated();
-        $request = getJsonInput();
         
         $basket = User::current()->getBasket();
         $basket->removeLine($request["productId"]);
@@ -123,11 +121,10 @@ class BasketController extends ControllerBase {
     
     public function completeOrder() {
         $this->verifyAuthenticated();
+        
         $basket = User::current()->getBasket();
         $basket->completeOrder($this->basketRepository);
-    
         User::current()->basket = null;
-        
         setJsonResponse($basket->id);
     }
 }
@@ -140,50 +137,51 @@ class UserController extends ControllerBase {
         parent::__construct("user");
         $this->userRepository = $userRepository;
         $this->languageRepository = $languageRepository;
-        $this->registerAction("register", function() { $this->register(); });
-        $this->registerAction("existsUser", function() { $this->existsUser(); });
-        $this->registerAction("login", function() { $this->login(); });
+        $this->registerAction("register", function() { $this->register(getJsonInput()); });
+        $this->registerAction("existsUser", function() { $this->existsUser(getStringFromUrl("email")); });
+        $this->registerAction("login", function() { $this->login(getJsonInput()); });
         $this->registerAction("logout", function() { $this->logout(); });
         $this->registerAction("getCurrent", function() { $this->getCurrent(); });
         $this->registerAction("languages", function() { $this->languages(); });
     }
 
-    public function register() {
+    public function register($request) {
         $user = new User();
-        $user->applyValuesFromArray(getJsonInput());
+        $user->applyValuesFromArray($request);
         
-        if ($this->userRepository->existsByEmail($user->email)) {
-            setErrorResponse('User already exists.');
+        if ($user->validate($this->userRepository, $request["passwordConfirm"])) {
+            $this->userRepository->insert($user);
         }
         else {
-            $this->userRepository->insert($user);
+            setErrorResponse("Validation error occured.");
         }
     }
     
-    public function existsUser() {
-        $userExists = $this->userRepository->existsByEmail(getStringFromUrl("email"));
+    public function existsUser($email) {
+        $userExists = $this->userRepository->existsByEmail();
         setJsonResponse($userExists);
     }
     
-    public function login() {
-        $credentials = getJsonInput();
-        $success = User::login($this->userRepository, $credentials["email"], $credentials["password"]);
-        setJsonResponse($success);
+    public function login($request) {
+        User::login($this->userRepository, $request["email"], $request["password"]);
+        setJsonResponse(User::isAuthenticated());
     }
     
     public function logout() {
         $this->verifyAuthenticated();
+        
         User::logout();
     }
     
     public function getCurrent() {
         $this->verifyAuthenticated();
+        
         setJsonResponse(User::current());
     }
         
     public function languages() {
-        $result = $this->languageRepository->getAll();
-        setJsonResponse($result);
+        $languages = $this->languageRepository->getAll();
+        setJsonResponse($languages);
     }
 }
 

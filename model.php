@@ -88,6 +88,8 @@ class BasketLine extends EntityBase {
 }
 
 class User extends EntityBase {
+    const USER_SESSION_KEY = 'currentUser';
+    
     function __construct() {
         // 1 = superuser
         // 2 = customer
@@ -114,40 +116,25 @@ class User extends EntityBase {
     }
     
     public static function current() {
-        if (isset($_SESSION["currentUser"])) {
-            return $_SESSION["currentUser"];
-        }
-        else {
-            return null;
-        }
+        return self::isAuthenticated() ? $_SESSION[self::USER_SESSION_KEY] : null;
     }
     
     public static function isAuthenticated() {
-        return User::current() !== null;
+        return isset($_SESSION[self::USER_SESSION_KEY]);
     }
     
     public static function login($userRepository, $email, $password) {
         $user = $userRepository->getByEmail($email);
         
-        if (isset($user) && $user->isPasswordValid($password)) {
+        if ($user !== null && $user->isPasswordValid($password)) {
             unset($user->salt);
             unset($user->password);
-            $_SESSION["currentUser"] = $user;
-            
-            return true;
-        }
-        else {
-            return false;
+            $_SESSION[self::USER_SESSION_KEY] = $user;
         }
     }
     
     public static function logout() {
-        $_SESSION["currentUser"] = null;
-    }
-    
-    public function setPassword($password) {
-        $this->salt = bin2hex(openssl_random_pseudo_bytes(8));
-        $this->password = $this->getHash($password);
+        $_SESSION[self::USER_SESSION_KEY] = null;
     }
     
     public function applyValuesFromArray($newValues) {
@@ -160,8 +147,31 @@ class User extends EntityBase {
         $this->setPassword($newValues["password"]);
     }
     
+    public function validate($userRepository, $passwordConfirm) {
+        return $this->areNotNullOrEmpty($this->givenname, $this->surname, $this->street, $this->postCode, $this->city, $passwordConfirm)
+            && filter_var($this->email, FILTER_VALIDATE_EMAIL)
+            && $this->password === $this->getHash($passwordConfirm)
+            && $userRepository->existsByEmail($this->email) === false;
+    }
+    
     private function isPasswordValid($password) {
         return $this->password === $this->getHash($password);
+    }
+    
+    private function setPassword($password) {
+        $this->salt = bin2hex(openssl_random_pseudo_bytes(8));
+        $this->password = $this->getHash($password);
+    }
+    
+    function areNotNullOrEmpty($values) {
+        $values = func_get_args();
+        foreach ($values as $value) {
+            if (!isset($value) || trim($value) === '') {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     private function getHash($password) {
