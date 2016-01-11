@@ -115,7 +115,7 @@
                 'orderCompleted': 'La commande a été envoyée.'
             });
 
-            $translateProvider.preferredLanguage('de');
+            $translateProvider.preferredLanguage('DE');
             $translateProvider.useSanitizeValueStrategy(null);
         });
 
