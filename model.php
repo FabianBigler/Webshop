@@ -150,17 +150,17 @@ class User extends EntityBase {
     public function validate($userRepository, $passwordConfirm) {
         return $this->areNotNullOrEmpty($this->givenname, $this->surname, $this->street, $this->postCode, $this->city, $passwordConfirm)
             && filter_var($this->email, FILTER_VALIDATE_EMAIL)
-            && $this->password === $this->getHash($passwordConfirm)
+            && $this->password === $this->getHashedPassword($passwordConfirm)
             && $userRepository->existsByEmail($this->email) === false;
     }
     
     private function isPasswordValid($password) {
-        return $this->password === $this->getHash($password);
+        return $this->password === $this->getHashedPassword($password);
     }
     
     private function setPassword($password) {
         $this->salt = bin2hex(openssl_random_pseudo_bytes(8));
-        $this->password = $this->getHash($password);
+        $this->password = $this->getHashedPassword($password);
     }
     
     function areNotNullOrEmpty($values) {
@@ -174,7 +174,7 @@ class User extends EntityBase {
         return true;
     }
     
-    private function getHash($password) {
+    private function getHashedPassword($password) {
         return hash("sha256", $password . $this->salt);
     }
 }
