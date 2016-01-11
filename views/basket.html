@@ -1,7 +1,7 @@
-<h1>{{'basket' | translate }}</h1>
+<h1>{{'basket' | translate}}</h1>
 <uib-alert close="status.show = false" type="{{status.type}}" 
            ng-show="status.show === true">
-    {{ status.messageKey | translate }}
+    {{ status.messageKey | translate}}
 </uib-alert>
 
 <div class="row">
@@ -33,7 +33,7 @@
             <tr ng-repeat="line in basket.lines">
                 <td>{{line.productName}}</td>
                 <td style="text-align:right">{{line.amount}}</td>
-                <td style="text-align:right">{{line.productPrice}}</td>
+                <td style="text-align:right">{{line.productPrice | number:2}}</td>
                 <td style="text-align:right">{{line.amount * line.productPrice | number:2}}</td>                
                 <td><button class="btn btn-primary glyphicon glyphicon-remove"                        
                         ng-click="removeBasketLine(line)">                          

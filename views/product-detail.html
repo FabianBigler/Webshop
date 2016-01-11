@@ -1,7 +1,7 @@
 <h1>{{'detail' | translate }}: {{product.name}}</h1>
 <uib-alert close="status.show = false" type="{{status.type}}" 
            ng-show="status.show === true">
-    {{ status.messageKey | translate }}
+    {{status.messageKey | translate}}
 </uib-alert>
 
 <div class="row">
@@ -12,7 +12,7 @@
         <h3>{{product.description}}<h3>
         <h3>{{'price' | translate}} </h3>
         <div class="input-group col-sm-4">
-            <p> {{product.price}} CHF</p>
+            <p> {{product.price | number:2}} CHF</p>
         </div>    
         <div class="input-group col-sm-4"
              ng-show="app.userAuthenticated">
