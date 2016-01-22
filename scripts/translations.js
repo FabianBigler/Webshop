@@ -38,7 +38,9 @@
                 'FR': 'Français',
                 'DE': 'Deutsch',
                 'EN': 'English',
-                'orderCompleted': 'Die Bestellung wurde abgeschickt.'
+                'orderCompleted': 'Die Bestellung wurde abgeschickt.',
+                'profile': 'Profil',
+                'previousOrders': 'Bisherige Bestellungen'
             });
             
             $translateProvider.translations('EN', {
@@ -75,7 +77,9 @@
                 'FR': 'Français',
                 'DE': 'Deutsch',
                 'EN': 'English',
-                'orderCompleted': 'The order has been sent.'
+                'orderCompleted': 'The order has been sent.',
+                'profile': 'Profile',
+                'previousOrders': 'Previous orders'
             });
 
             $translateProvider.translations('FR', {
@@ -112,7 +116,9 @@
                 'FR': 'Français',
                 'DE': 'Deutsch',
                 'EN': 'English',
-                'orderCompleted': 'La commande a été envoyée.'
+                'orderCompleted': 'La commande a été envoyée.',
+                'profile': 'Profile',
+                'previousOrders': 'Commandes précédentes'
             });
 
             $translateProvider.preferredLanguage('DE');
