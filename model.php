@@ -67,7 +67,6 @@ class Basket extends EntityBase {
     
     public function completeOrder($basketRepository, $userRepository) {
         $this->orderDate = date("Y-m-d H:i:s");
-		//$this->orderDate = new DateTime('NOW');
         $this->id = $basketRepository->insertHeader($this);
         
         foreach ($this->lines as $line) { 
@@ -78,7 +77,8 @@ class Basket extends EntityBase {
     }
     
     private function sendEmail($userRepository) {
-		$user = $userRepository->getByEmail(User::current()->email);
+        $user = $userRepository->getByEmail(User::current()->email);
+        
         switch(getLangFromCookie()) { 
             case 'FR':
                 $subject = 'Votre Ordre chez Maribelle';
