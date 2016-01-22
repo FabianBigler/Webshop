@@ -14,7 +14,7 @@ class ControllerFactory {
         $productRepo = new ProductRepository();
         $this->registerController(new ProductController($productRepo));
         $this->registerController(new UserController(new UserRepository(), new LanguageRepository()));
-        $this->registerController(new BasketController(new BasketRepository(), $productRepo));
+        $this->registerController(new BasketController(new BasketRepository(), $productRepo, new UserRepository()));
     }
     
     public function resolveController() {
@@ -87,11 +87,13 @@ class ProductController extends ControllerBase {
 class BasketController extends ControllerBase {    
     private $basketRepository;
     private $productRepository;
+	private $userRepository;
     
-    function __construct($basketRepository, $productRepository) {
+    function __construct($basketRepository, $productRepository, $userRepository) {
         parent::__construct("basket");
         $this->basketRepository = $basketRepository;
         $this->productRepository = $productRepository;    
+		$this->userRepository = $userRepository;
         $this->registerAction("getBasket", function() { $this->getBasket(); });            
         $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(getJsonInput()); });
         $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(getJsonInput()); });
@@ -123,7 +125,8 @@ class BasketController extends ControllerBase {
         $this->verifyAuthenticated();
         
         $basket = User::current()->getBasket();
-        $basket->completeOrder($this->basketRepository);
+        $basket->completeOrder($this->basketRepository, $this->userRepository);
+		
         User::current()->basket = null;
         setJsonResponse($basket->id);
     }

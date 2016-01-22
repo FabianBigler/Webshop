@@ -93,7 +93,7 @@ class ProductRepository extends RepositoryBase {
             while ($stmt->fetch()) {
                 $ingredient = new Ingredient();
                 $ingredient->id = intval($row_id);
-                $ingredient->name = utf8_encode($row_name);
+                $ingredient->name = $row_name;
                 
                 $result[] = $ingredient;
             }
@@ -105,11 +105,11 @@ class ProductRepository extends RepositoryBase {
     private function buildProductByRow($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription) {
         $product = new Product();
         $product->id = intval($row_id);
-        $product->name = utf8_encode($row_name);
+        $product->name = $row_name;
         $product->price = floatval($row_price);
-        $product->imgSmallPath = utf8_encode($row_img);
-        $product->description = utf8_encode($row_description);
-        $product->shortDescription = utf8_encode($row_shortDescription);
+        $product->imgSmallPath = $row_img;
+        $product->description = $row_description;
+        $product->shortDescription = $row_shortDescription;
         
         return $product;
     }
@@ -205,9 +205,9 @@ class LanguageRepository extends RepositoryBase {
             $stmt->bind_result($row_code, $row_name);
             $result = array();
             while ($stmt->fetch()) {
-                $lang = new Language();
-                $lang->code = utf8_encode($row_code);
-                $lang->name = utf8_encode($row_name);
+                $lang = new Language();				
+                $lang->code = $row_code;
+                $lang->name = $row_name;
                 
                 $result[] = $lang;
             }
