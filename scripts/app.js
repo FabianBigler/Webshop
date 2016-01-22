@@ -112,8 +112,7 @@ var maribelle;
         function getCurrentUser() {
             return $http({
                 url: rootUrl + '/controller.php?controller=user&action=getCurrent',
-                method: 'GET',
-                params: null,
+                method: 'GET'
             })
             .then(maribelle.mapData)
         }
