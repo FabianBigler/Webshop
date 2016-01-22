@@ -150,7 +150,7 @@ var maribelle;
     }
     
     angular.module('maribelle', ['maribelle.routing', 'maribelle.translations', 'ui.bootstrap', 'ngAnimate', 'ngCookies'])
-        .constant("rootUrl", "")
+        .constant("rootUrl", "/bm")
         .controller('AppViewModel', AppViewModel)
         .service('userService', UserServiceFactory)
         .factory('debounce', DebounceFactory)
