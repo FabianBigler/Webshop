@@ -12,9 +12,13 @@ class ControllerFactory {
     
     function __construct() {
         $productRepo = new ProductRepository();
+        $basketRepo = new BasketRepository();
+        $userRepo = new UserRepository();
+        $langRepo = new LanguageRepository();
+        
         $this->registerController(new ProductController($productRepo));
-        $this->registerController(new UserController(new UserRepository(), new LanguageRepository()));
-        $this->registerController(new BasketController(new BasketRepository(), $productRepo, new UserRepository()));
+        $this->registerController(new UserController($userRepo, $langRepo, $basketRepo));
+        $this->registerController(new BasketController($basketRepo, $productRepo, $userRepo));
     }
     
     public function resolveController() {
@@ -150,16 +154,19 @@ class BasketController extends ControllerBase {
 class UserController extends ControllerBase {
     private $userRepository;
     private $languageRepository;
+    private $basketRepository;
     
-    function __construct($userRepository, $languageRepository) {
+    function __construct($userRepository, $languageRepository, $basketRepository) {
         parent::__construct("user");
         $this->userRepository = $userRepository;
         $this->languageRepository = $languageRepository;
+        $this->basketRepository = $basketRepository;
         $this->registerAction("register", function() { $this->register(getJsonInput()); });
         $this->registerAction("existsUser", function() { $this->existsUser(getStringFromUrl("email")); });
         $this->registerAction("login", function() { $this->login(getJsonInput()); });
         $this->registerAction("logout", function() { $this->logout(); });
         $this->registerAction("getCurrent", function() { $this->getCurrent(); });
+        $this->registerAction("getBasketSummaryEntries", function() { $this->getBasketSummaryEntries(); });
         $this->registerAction("languages", function() { $this->languages(); });
     }
 
@@ -195,6 +202,13 @@ class UserController extends ControllerBase {
         $this->verifyAuthenticated();
         
         setJsonResponse(User::current());
+    }
+    
+    public function getBasketSummaryEntries() {
+        $this->verifyAuthenticated();
+        
+        $summaryEntries = $this->basketRepository->getSummaryForUser(User::current()->id);
+        setJsonResponse($summaryEntries);
     }
         
     public function languages() {

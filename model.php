@@ -158,6 +158,12 @@ class BasketLine extends EntityBase {
     public $amount;
 }
 
+class BasketSummary {
+    public $basketHeaderId;
+    public $userId;
+    public $lineCount;
+}
+
 class User extends EntityBase {
     const USER_SESSION_KEY = 'currentUser';
     

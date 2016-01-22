@@ -190,6 +190,33 @@ class BasketRepository extends RepositoryBase {
             return $result;
         });
     }
+    
+    public function getSummaryForUser($userId) {
+        $sql = "SELECT
+                    id, 
+                    userId, 
+                    (SELECT COUNT(*) FROM basketLine WHERE headerId = H.id) AS LineCount
+                FROM basketHeader H
+                WHERE userId = ?";
+
+        return $this->query($sql, function($stmt, $con) use($userId) {
+            $stmt->bind_param('i', $userId);
+            $stmt->execute();
+            
+            $stmt->bind_result($row_id, $row_userId, $row_lineCount);
+            $result = array();
+            while ($stmt->fetch()) {
+                $basketSummary = new BasketSummary();
+                $basketSummary->basketHeaderId = intval($row_id);
+                $basketSummary->userId = intval($row_userId);
+                $basketSummary->lineCount = intval($row_lineCount);
+                
+                $result[] = $basketSummary;
+            }
+            
+            return $result;
+        });
+    }
 }
 
 class UserRepository extends RepositoryBase {
