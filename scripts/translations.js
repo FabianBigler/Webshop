@@ -40,7 +40,10 @@
                 'EN': 'English',
                 'orderCompleted': 'Die Bestellung wurde abgeschickt.',
                 'profile': 'Profil',
-                'previousOrders': 'Bisherige Bestellungen'
+                'previousOrders': 'Bisherige Bestellungen',
+                'noOrdersJet': 'Bisher keine Bestellungen gesendet.',
+                'orderOf': 'Bestellung vom',
+                'linesInOrder': 'Produkt(e) bestellt'
             });
             
             $translateProvider.translations('EN', {
@@ -79,7 +82,10 @@
                 'EN': 'English',
                 'orderCompleted': 'The order has been sent.',
                 'profile': 'Profile',
-                'previousOrders': 'Previous orders'
+                'previousOrders': 'Previous orders',
+                'noOrdersJet': 'So far no orders sent.',
+                'orderOf': 'Order from',
+                'linesInOrder': 'ordered product(s)'
             });
 
             $translateProvider.translations('FR', {
@@ -118,7 +124,10 @@
                 'EN': 'English',
                 'orderCompleted': 'La commande a été envoyée.',
                 'profile': 'Profile',
-                'previousOrders': 'Commandes précédentes'
+                'previousOrders': 'Commandes précédentes',
+                'noOrdersJet': 'Jusqu\'ici envoyé pas des ordres.',
+                'orderOf': 'Commande du',
+                'linesInOrder': 'produit(s) commandés'
             });
 
             $translateProvider.preferredLanguage('DE');

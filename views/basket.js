@@ -24,8 +24,9 @@
         };
         
         $scope.completeOrder = function() {
+            $scope.isReadonly = true;
+            
             completeOrder().then(function(basketId) {
-                $scope.isReadonly = true;
                 $scope.status = { type: 'success', messageKey: 'orderCompleted', show: true };
             });
         };

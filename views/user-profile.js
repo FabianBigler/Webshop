@@ -8,6 +8,9 @@
         
         getBasketSummaryEntries().then(function(entries) {
             $scope.summaryEntries = entries;
+            $scope.summaryEntries.forEach(function(e) { 
+                e.orderDate = new Date(e.orderDate);
+            });
         });
         
         function getBasketSummaryEntries() {

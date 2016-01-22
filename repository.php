@@ -43,7 +43,7 @@ class RepositoryBase {
 class ProductRepository extends RepositoryBase {        
     public function getAll($language) {
         $sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
-                INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `language-code`=?)";
+                INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `language-code`= ?)";
         
         return $this->query($sql, function($stmt) use($language) {
             $stmt->bind_param('s', $language);
@@ -61,7 +61,7 @@ class ProductRepository extends RepositoryBase {
     
     public function getById($productId, $language) {
         $sql = "SELECT product.id, name, price, imgSmallPath, description, `short-description` FROM `product` 
-                INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `product`.`id`=? AND `language-code`=?)";
+                INNER JOIN `productText` ON (product.id=`productText`.`product-id` AND `product`.`id`= ? AND `language-code`= ?)";
         
         return $this->query($sql, function($stmt) use($productId, $language) {
             $stmt->bind_param('is', $productId, $language);
@@ -80,8 +80,8 @@ class ProductRepository extends RepositoryBase {
     public function getIngredients($productId, $language) {
         $sql = "SELECT ingredient.id, ingredient.name FROM `productIngredient` 
                 INNER JOIN ingredient ON (ingredient.id=`productIngredient`.`ingredient-id` 
-                    AND ingredient.`language-code`=? 
-                    AND `productIngredient`.`product-id`=?) 
+                    AND ingredient.`language-code`= ? 
+                    AND `productIngredient`.`product-id`= ?) 
                 ORDER BY `productIngredient`.`position`";
         
         return $this->query($sql, function($stmt) use($productId, $language) {
@@ -199,7 +199,8 @@ class BasketRepository extends RepositoryBase {
                     orderDate,
                     (SELECT COUNT(*) FROM basketLine WHERE headerId = H.id) AS LineCount
                 FROM basketHeader H
-                WHERE userId = ?";
+                WHERE userId = ?
+                ORDER BY orderDate DESC";
 
         return $this->query($sql, function($stmt, $con) use($userId) {
             $stmt->bind_param('i', $userId);
