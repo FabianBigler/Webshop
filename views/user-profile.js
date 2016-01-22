@@ -2,8 +2,21 @@
 
 (function (user) {
 
-    function ProfileViewModel($scope, userService) {
-        $scope.newUser = userService.currentUser();
+    function ProfileViewModel($scope, $http, rootUrl, userService) {
+        $scope.user = userService.currentUser();
+        $scope.summaryEntries = [];
+        
+        getBasketSummaryEntries().then(function(entries) {
+            $scope.summaryEntries = entries;
+        });
+        
+        function getBasketSummaryEntries() {
+            return $http({
+                url: rootUrl + '/controller.php?controller=user&action=getBasketSummaryEntries',
+                method: 'GET'
+            })
+            .then(maribelle.mapData);
+        }
     }
 
     user.profileRoute = {
