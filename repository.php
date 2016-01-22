@@ -117,11 +117,10 @@ class ProductRepository extends RepositoryBase {
 
 class BasketRepository extends RepositoryBase {        
     public function insertHeader($basket) {
-        $sql = "INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`) 
-                VALUES (?,?,?,?,?,?,?)";
-        
+        $sql = "INSERT INTO `basketHeader`(`userId`, `deliveryStreet`, `deliveryPostCode`, `deliveryCity`, `invoiceStreet`, `invoicePostCode`, `invoiceCity`, `orderDate`) 
+                VALUES (?,?,?,?,?,?,?,?)";        
         return $this->query($sql, function($stmt, $con) use($basket) {
-            $stmt->bind_param('issssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity);
+            $stmt->bind_param('isssssss', $basket->userId, $basket->deliveryStreet, $basket->deliveryPostCode, $basket->deliveryCity, $basket->invoiceStreet, $basket->invoicePostCode, $basket->invoiceCity, $basket->orderDate);
             $stmt->execute();
             
             return $con->insert_id;
@@ -145,6 +144,7 @@ class BasketRepository extends RepositoryBase {
                     BH.id, BH.userid, 
                     BH.deliveryStreet, BH.deliveryPostCode, BH.deliveryCity, 
                     BH.invoiceStreet, BH.invoicePostCode, BH.invoiceCity,
+					BH.orderDate,
                     BL.id AS basketLineId,
                     BL.productId,
                     PT.name,
@@ -160,7 +160,7 @@ class BasketRepository extends RepositoryBase {
             $stmt->bind_param('is', $headerId, $language);
             $stmt->execute();
             
-            $stmt->bind_result($row_id, $row_userId, $row_deliveryStreet, $row_deliveryPostCode, $row_deliveryCity, $row_invoiceStreet, $row_invoicePostCode, $row_invoiceCity, $row_basketLineId, $row_productId, $row_productName, $row_productPrice, $row_amount);
+            $stmt->bind_result($row_id, $row_userId, $row_deliveryStreet, $row_deliveryPostCode, $row_deliveryCity, $row_invoiceStreet, $row_invoicePostCode, $row_invoiceCity, $row_orderDate, $row_basketLineId, $row_productId, $row_productName, $row_productPrice, $row_amount);
             $result = null;
             if ($stmt->fetch()) {
                 $result = new Basket(null);
@@ -172,6 +172,7 @@ class BasketRepository extends RepositoryBase {
                 $result->invoiceStreet = $row_invoiceStreet;
                 $result->invoicePostCode = $row_invoicePostCode;
                 $result->invoiceCity = $row_invoiceCity;
+				$result->orderDate = $row_orderDate;
                 $result->lines = array();
                 
                 do {
@@ -195,6 +196,7 @@ class BasketRepository extends RepositoryBase {
         $sql = "SELECT
                     id, 
                     userId, 
+					orderDate,
                     (SELECT COUNT(*) FROM basketLine WHERE headerId = H.id) AS LineCount
                 FROM basketHeader H
                 WHERE userId = ?";
@@ -203,14 +205,14 @@ class BasketRepository extends RepositoryBase {
             $stmt->bind_param('i', $userId);
             $stmt->execute();
             
-            $stmt->bind_result($row_id, $row_userId, $row_lineCount);
+            $stmt->bind_result($row_id, $row_userId, $row_orderDate, $row_lineCount);
             $result = array();
             while ($stmt->fetch()) {
                 $basketSummary = new BasketSummary();
                 $basketSummary->basketHeaderId = intval($row_id);
                 $basketSummary->userId = intval($row_userId);
                 $basketSummary->lineCount = intval($row_lineCount);
-                $basketSummary->orderDate = date("Y-m-d H:i:s");
+                $basketSummary->orderDate = $row_orderDate;
                 
                 $result[] = $basketSummary;
             }
