@@ -5,6 +5,7 @@
     "files": [
         "scripts/app.js",
         "scripts/routes.js",
+        "scripts/translations",
         "views/*.js"
     ]
 }

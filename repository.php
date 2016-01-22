@@ -172,7 +172,7 @@ class BasketRepository extends RepositoryBase {
                 $result->invoiceStreet = $row_invoiceStreet;
                 $result->invoicePostCode = $row_invoicePostCode;
                 $result->invoiceCity = $row_invoiceCity;
-				$result->orderDate = $row_orderDate;
+                $result->orderDate = $row_orderDate;
                 $result->lines = array();
                 
                 do {

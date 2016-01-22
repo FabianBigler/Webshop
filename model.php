@@ -103,6 +103,7 @@ class Basket extends EntityBase {
                 $colName = 'Name';
                 $colPrice = 'Preis';
                 $colTotal = 'Total';
+                break;
         }
         
         $message = '    <html>
@@ -141,7 +142,6 @@ class Basket extends EntityBase {
                     'Bcc: fabigler@hotmail.com' . "\r\n" .
                     'Content-Type: text/html; charset=utf-8';
                     
-        
         mail($user->email, $subject, $message, $headers);
     }
 }
