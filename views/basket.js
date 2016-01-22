@@ -42,7 +42,7 @@
 
         function getBasket() {
             return $http({
-                url: rootUrl + '/controller.php?controller=basket&action=getBasket',
+                url: rootUrl + '/controller.php?controller=basket&action=getCurrentBasket',
                 method: 'GET',
                 params: null,
             })

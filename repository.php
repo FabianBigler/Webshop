@@ -93,7 +93,7 @@ class ProductRepository extends RepositoryBase {
             while ($stmt->fetch()) {
                 $ingredient = new Ingredient();
                 $ingredient->id = intval($row_id);
-                $ingredient->name = utf8_encode($row_name);
+                $ingredient->name = $row_name;
                 
                 $result[] = $ingredient;
             }
@@ -105,11 +105,11 @@ class ProductRepository extends RepositoryBase {
     private function buildProductByRow($row_id, $row_name, $row_price, $row_img, $row_description, $row_shortDescription) {
         $product = new Product();
         $product->id = intval($row_id);
-        $product->name = utf8_encode($row_name);
+        $product->name = $row_name;
         $product->price = floatval($row_price);
-        $product->imgSmallPath = utf8_encode($row_img);
-        $product->description = utf8_encode($row_description);
-        $product->shortDescription = utf8_encode($row_shortDescription);
+        $product->imgSmallPath = $row_img;
+        $product->description = $row_description;
+        $product->shortDescription = $row_shortDescription;
         
         return $product;
     }
@@ -137,6 +137,57 @@ class BasketRepository extends RepositoryBase {
             $stmt->execute();
             
             return $con->insert_id;
+        });
+    }
+    
+    public function getById($headerId, $language) {
+        $sql = "SELECT 
+                    BH.id, BH.userid, 
+                    BH.deliveryStreet, BH.deliveryPostCode, BH.deliveryCity, 
+                    BH.invoiceStreet, BH.invoicePostCode, BH.invoiceCity,
+                    BL.id AS basketLineId,
+                    BL.productId,
+                    PT.name,
+                    BL.productPrice,
+                    BL.amount
+                FROM `basketHeader` BH
+                INNER JOIN `basketLine` BL ON BL.headerId = BH.id
+                INNER JOIN product P ON P.id = BL.productId
+                INNER JOIN productText PT ON PT.`product-id` = P.id
+                WHERE BH.id = ? AND PT.`language-code` = ?";
+                
+        return $this->query($sql, function($stmt, $con) use($headerId, $language) {
+            $stmt->bind_param('is', $headerId, $language);
+            $stmt->execute();
+            
+            $stmt->bind_result($row_id, $row_userId, $row_deliveryStreet, $row_deliveryPostCode, $row_deliveryCity, $row_invoiceStreet, $row_invoicePostCode, $row_invoiceCity, $row_basketLineId, $row_productId, $row_productName, $row_productPrice, $row_amount);
+            $result = null;
+            if ($stmt->fetch()) {
+                $result = new Basket(null);
+                $result->id = intval($row_id);
+                $result->userId = intval($row_userId);
+                $result->deliveryStreet = $row_deliveryStreet;
+                $result->deliveryPostCode = $row_deliveryPostCode;
+                $result->deliveryCity = $row_deliveryCity;
+                $result->invoiceStreet = $row_invoiceStreet;
+                $result->invoicePostCode = $row_invoicePostCode;
+                $result->invoiceCity = $row_invoiceCity;
+                $result->lines = array();
+                
+                do {
+                    $line = new BasketLine(null, null);
+                    $line->id = intval($row_basketLineId);
+                    $line->productId = intval($row_productId);
+                    $line->productName = $row_productName;
+                    $line->productPrice = floatval($row_productPrice);
+                    $line->amount = floatval($row_amount);
+                    
+                    $result->lines[] = $line;
+                }
+                while ($stmt->fetch());
+            }
+            
+            return $result;
         });
     }
 }
@@ -206,8 +257,8 @@ class LanguageRepository extends RepositoryBase {
             $result = array();
             while ($stmt->fetch()) {
                 $lang = new Language();
-                $lang->code = utf8_encode($row_code);
-                $lang->name = utf8_encode($row_name);
+                $lang->code = $row_code;
+                $lang->name = $row_name;
                 
                 $result[] = $lang;
             }

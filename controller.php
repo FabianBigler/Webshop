@@ -92,13 +92,22 @@ class BasketController extends ControllerBase {
         parent::__construct("basket");
         $this->basketRepository = $basketRepository;
         $this->productRepository = $productRepository;    
-        $this->registerAction("getBasket", function() { $this->getBasket(); });            
+        $this->registerAction("getBasket", function() { $this->getBasket(getStringFromUrl("id")); });            
+        $this->registerAction("getCurrentBasket", function() { $this->getCurrentBasket(); });            
         $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(getJsonInput()); });
         $this->registerAction("removeLinefromBasket", function() { $this->removeLinefromBasket(getJsonInput()); });
         $this->registerAction("completeOrder", function() { $this->completeOrder(); });
     }
     
-    public function getBasket() {
+    public function getBasket($id) {
+        $this->verifyAuthenticated();
+        
+        $basket = $this->basketRepository->getById($id, getLangFromCookie());
+        $this->verifyUserPermitted($basket);
+        setJsonResponse($basket);
+    }
+    
+    public function getCurrentBasket() {
         $this->verifyAuthenticated();
         
         $basket = User::current()->getBasket();
@@ -126,6 +135,12 @@ class BasketController extends ControllerBase {
         $basket->completeOrder($this->basketRepository);
         User::current()->basket = null;
         setJsonResponse($basket->id);
+    }
+    
+    private function verifyUserPermitted($basket) {
+        if ($basket == null || $basket->userId !== User::current()->id) {
+            setErrorResponse("Basket not found or not permitted.");
+        }
     }
 }
 
