@@ -1,4 +1,5 @@
 <?php
+require_once "helper.php";
 
 class EntityBase {
     public $id;
@@ -63,17 +64,84 @@ class Basket extends EntityBase {
     }
     
     public function completeOrder($basketRepository, $userRepository) {
+		$user = $userRepository->getByEmail(User::current()->email);
+		$this->sendEmail($user);	
+		
         $this->id = $basketRepository->insertHeader($this);
         
         foreach ($this->lines as $line) { 
             $line->id = $basketRepository->insertLine($this->id, $line->productId, $line->productPrice, $line->amount);
-        }
-		
-		//$this->userID;
-		
-		
-
+        }				
     }
+	
+	private function sendEmail($user)
+	{
+		$to = $user->email;
+		$lang = getLangFromCookie();
+		
+		//default language: german
+		$subject = 'Ihre Bestellung bei Maribelle';
+		$colAmount = 'Anzahl';
+		$colName = 'Name';
+		$colPrice = 'Preis';
+		$colTotal = 'Total';
+		$body = 'Liebe(r) ' . $user->givenname . ' ' . $user->surname . ' Vielen Dank für deine Bestellung. Ihre bestellten Artikel: ';
+		
+		switch($lang) 
+		{			
+			case 'FR':
+				$subject = 'Votre Ordre chez Maribelle';
+				$body = 'Merci ' . $user->givenname . ' ' . $user->surname . ' pour votre ordre. Les articles:';
+				$colAmount = 'Quantité';
+				$colName = 'Nom';
+				$colPrice = 'Prix';
+				$colTotal = 'Totale';				
+				break;
+			case 'EN':
+				$subject = 'Your Order at Maribelle';
+				$body = 'Thank you, ' . $user->givenname . ' ' . $user->surname . ', for your order. Your ordered products:';
+				$colAmount = 'Amount';
+				$colName = 'Name';
+				$colPrice = 'Price';
+				$colTotal = 'Total';
+				break;			
+		}
+		
+		$message = '	<html>
+						<head>
+						  <title>' . $subject .'</title>
+						</head>
+						<body>
+						  <p>' . $body . '</p>
+						  <table border="1" width="100%">
+							<tr>
+							  <th width="25%">' . $colName . '</th><th width="25%" align="right">' . $colAmount . '</th><th width="25%" align="right">' . $colPrice . '</th><th widht="25%" align="right">' . $colTotal . '</th>
+							</tr>';									
+						$total = 0;
+						$subtotal = 0;
+						
+						foreach ($this->lines as $line) {
+							$message .= '<tr>';
+							$message .= '<td width="25%">' . $line->productName . '</td>';
+							$message .= '<td width="25%" align="right">' . $line->amount . '</td>';
+							$message .= '<td width="25%" align="right">' . $line->productPrice . '</td>';
+							$subtotal = $line->amount * $line->productPrice;
+							$message .= '<td width="25%" align="right">' . $subtotal . '</td>';							
+							$message .= '</tr>';
+							$total += $subtotal;
+						}						
+						$message .= '<tr>';
+						$message .= '<td colspan="4"><p align="right"><strong>' . $colTotal . ' ' . $total . ' CHF </strong></p></td>';
+						$message .= '</tr>';
+						$message .= '</table></body></html>';				
+		
+		$headers = 	'From: marina@maribelle.ch' . "\r\n" .
+					'Reply-To: marina@maribelle.ch' . "\r\n" .
+					'X-Mailer: PHP/' . phpversion() . "\r\n" . 
+					'Bcc: fabigler@hotmail.com' . "\r\n" .
+					'Content-Type: text/html; charset=utf-8';
+		mail($to, $subject, $message, $headers);
+	}
 }
 
 class BasketLine extends EntityBase {

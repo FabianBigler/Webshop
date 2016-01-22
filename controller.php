@@ -93,6 +93,7 @@ class BasketController extends ControllerBase {
         parent::__construct("basket");
         $this->basketRepository = $basketRepository;
         $this->productRepository = $productRepository;    
+		$this->userRepository = $userRepository;
         $this->registerAction("getBasket", function() { $this->getBasket(getStringFromUrl("id")); });            
         $this->registerAction("getCurrentBasket", function() { $this->getCurrentBasket(); });            
         $this->registerAction("addLineToBasket", function() { $this->addLineToBasket(getJsonInput()); });
