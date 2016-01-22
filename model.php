@@ -40,6 +40,7 @@ class Basket extends EntityBase {
     public $invoicePostCode;
     public $invoiceCity;
     public $lines = array();
+    public $orderDate;
     
     public function addLine($productId, $amount, $language, $productRepository) {
         $found = false;
@@ -65,17 +66,17 @@ class Basket extends EntityBase {
     }
     
     public function completeOrder($basketRepository, $userRepository) {
-        $user = $userRepository->getByEmail(User::current()->email);
-        $this->sendEmail($user);    
-        
+        $this->orderDate = date("Y-m-d H:i:s");
         $this->id = $basketRepository->insertHeader($this);
         
         foreach ($this->lines as $line) { 
             $line->id = $basketRepository->insertLine($this->id, $line->productId, $line->productPrice, $line->amount);
-        }                
+        }       
+        
+        $this->sendEmail($userRepository);          
     }
     
-    private function sendEmail($user) {
+    private function sendEmail($userRepository) {
         switch(getLangFromCookie()) { 
             case 'FR':
                 $subject = 'Votre Ordre chez Maribelle';
@@ -138,6 +139,7 @@ class Basket extends EntityBase {
                     'Bcc: fabigler@hotmail.com' . "\r\n" .
                     'Content-Type: text/html; charset=utf-8';
                     
+        $user = $userRepository->getByEmail(User::current()->email);
         mail($user->email, $subject, $message, $headers);
     }
 }
@@ -162,6 +164,7 @@ class BasketSummary {
     public $basketHeaderId;
     public $userId;
     public $lineCount;
+    public $orderDate;
 }
 
 class User extends EntityBase {

@@ -210,6 +210,7 @@ class BasketRepository extends RepositoryBase {
                 $basketSummary->basketHeaderId = intval($row_id);
                 $basketSummary->userId = intval($row_userId);
                 $basketSummary->lineCount = intval($row_lineCount);
+                $basketSummary->orderDate = date("Y-m-d H:i:s");
                 
                 $result[] = $basketSummary;
             }
