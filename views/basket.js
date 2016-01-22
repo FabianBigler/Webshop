@@ -2,15 +2,16 @@
 
 (function (basket) {
 
-    function BasketViewModel($scope, $http, $state, rootUrl) {
+    function BasketViewModel($scope, $http, $state, $stateParams, rootUrl) {
         $scope.basket = {};
-        $scope.status = {};            
+        $scope.status = {};
+        $scope.isReadonly = $stateParams.id ? true : false;
 
-        getBasket().then(function (basket) {
+        getBasket($stateParams.id, $scope.isReadonly).then(function (basket) {
             $scope.basket = basket;
         });
 
-        $scope.removeBasketLine = function(line) {                
+        $scope.removeBasketLine = function(line) {
             removeLineFromBasket(line.productId).then(function() {
                 var index = $scope.basket.lines.indexOf(line);                        
                 $scope.basket.lines.splice(index, 1);
@@ -24,11 +25,10 @@
         
         $scope.completeOrder = function() {
             completeOrder().then(function(basketId) {
-                // TODO: Redirect to completed basked, show confirmation there.
-                // $state.go(basket.basketRoute, { id: basketId }, { reload: true });
+                $scope.isReadonly = true;
                 $scope.status = { type: 'success', messageKey: 'orderCompleted', show: true };
             });
-        }
+        };
         
         $scope.getTotal = function() {
             if(!$scope.basket.lines) { 
@@ -38,13 +38,16 @@
             return $scope.basket.lines.reduce(function(acc, line) { 
                 return acc + line.productPrice * line.amount; 
             }, 0);
-        }
+        };
 
-        function getBasket() {
+        function getBasket(id, isReadonly) {
+            var actionName = isReadonly ? 'getBasket' : 'getCurrentBasket';
+            var params = isReadonly ? { id: id } : null;
+            
             return $http({
-                url: rootUrl + '/controller.php?controller=basket&action=getCurrentBasket',
+                url: rootUrl + '/controller.php?controller=basket&action=' + actionName,
                 method: 'GET',
-                params: null,
+                params: params
             })
             .then(maribelle.mapData);
         }
